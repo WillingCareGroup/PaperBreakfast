@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PaperBreakfast &mdash; {{ date }}</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: #f2f4f8;
+      color: #1a1a2e;
+      padding: 24px 16px;
+      line-height: 1.5;
+    }
+    .container { max-width: 680px; margin: 0 auto; }
+
+    /* ── Header ── */
+    .header {
+      background: #1a1a2e;
+      color: white;
+      border-radius: 10px;
+      padding: 28px 32px;
+      margin-bottom: 28px;
+    }
+    .header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+    .header .subtitle { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 3px; }
+    .stats { display: flex; gap: 28px; margin-top: 20px; }
+    .stat .num { font-size: 30px; font-weight: 700; color: #e94560; }
+    .stat .label {
+      font-size: 10px; text-transform: uppercase;
+      letter-spacing: 1.2px; color: rgba(255,255,255,0.4);
+    }
+
+    /* ── Journal sections ── */
+    .journal-section { margin-bottom: 32px; }
+    .journal-header {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.5px;
+      color: #999; padding-bottom: 8px;
+      border-bottom: 1px solid #dde2ed;
+      margin-bottom: 12px;
+    }
+
+    /* ── Paper cards ── */
+    .paper-card {
+      background: white;
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+      border-left: 4px solid #ccc;
+    }
+    .paper-card.tier-high   { border-left-color: #27ae60; }
+    .paper-card.tier-mid    { border-left-color: #f39c12; }
+    .paper-card.tier-low    { border-left-color: #bdc3c7; }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .authors {
+      font-size: 11px; color: #aaa;
+      flex: 1; min-width: 0;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .score-badge {
+      font-size: 13px; font-weight: 700;
+      padding: 2px 9px; border-radius: 20px;
+      flex-shrink: 0;
+    }
+    .score-badge.tier-high { background: #eafaf1; color: #27ae60; }
+    .score-badge.tier-mid  { background: #fef9e7; color: #d68910; }
+    .score-badge.tier-low  { background: #f4f5f7; color: #95a5a6; }
+
+    .paper-title {
+      font-size: 15px; font-weight: 600;
+      line-height: 1.4; margin-bottom: 8px;
+    }
+    .paper-title a { color: #1a1a2e; text-decoration: none; }
+    .paper-title a:hover { color: #e94560; text-decoration: underline; }
+
+    .reasoning {
+      font-size: 12.5px; color: #777;
+      border-top: 1px solid #f0f2f7;
+      padding-top: 8px; margin-top: 8px;
+      font-style: italic;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center; font-size: 11px;
+      color: #bbb; padding: 24px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="header">
+      <h1>PaperBreakfast</h1>
+      <div class="subtitle">{{ date }}</div>
+      <div class="stats">
+        <div class="stat">
+          <div class="num">{{ total_papers }}</div>
+          <div class="label">Papers</div>
+        </div>
+        <div class="stat">
+          <div class="num">{{ journals | length }}</div>
+          <div class="label">Journals</div>
+        </div>
+      </div>
+    </div>
+
+    {% for journal_name, papers in journals %}
+    <div class="journal-section">
+      <div class="journal-header">
+        {{ journal_name }} &mdash; {{ papers | length }} paper{{ 's' if papers | length != 1 else '' }}
+      </div>
+
+      {% for paper in papers | sort(attribute='score', reverse=True) %}
+        {% set score_pct = ((paper.score or 0) * 100) | int %}
+        {% if (paper.score or 0) >= 0.75 %}
+          {% set tier = "high" %}
+        {% elif (paper.score or 0) >= 0.5 %}
+          {% set tier = "mid" %}
+        {% else %}
+          {% set tier = "low" %}
+        {% endif %}
+
+        <div class="paper-card tier-{{ tier }}">
+          <div class="card-top">
+            <div class="authors">
+              {{ paper.authors[:120] if paper.authors else 'Unknown authors' }}
+              {{ '&hellip;' if paper.authors and paper.authors | length > 120 else '' }}
+            </div>
+            <div class="score-badge tier-{{ tier }}">{{ score_pct }}%</div>
+          </div>
+
+          <div class="paper-title">
+            <a href="{{ paper.url }}" target="_blank" rel="noopener">{{ paper.title }}</a>
+          </div>
+
+          {% if paper.reasoning %}
+          <div class="reasoning">{{ paper.reasoning }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+
+    <div class="footer">
+      PaperBreakfast &mdash; {{ date }}
+    </div>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,48 @@
+# PaperBreakfast configuration
+# Copy this to config.yaml and edit — config.yaml is gitignored
+
+# Path to your interest profile (plain text / markdown)
+interest_profile_path: profile.md
+
+# SQLite database path
+db_path: paperbreakfast.db
+
+# --- Evaluator ---
+# Switch backends and strategies independently.
+#
+# backend.type options:
+#   claude        — Anthropic API (requires ANTHROPIC_API_KEY in .env)
+#   openai_compat — LM Studio, Ollama, or any OpenAI-compatible server
+#   keyword       — No LLM, pure keyword matching (good for testing)
+#
+# strategy.type options:
+#   relevance_json    — Returns {"score": 0.0-1.0, "reasoning": "..."}
+#   chain_of_thought  — Step-by-step reasoning, ends with SCORE: 0.0-1.0
+#
+# Papers with score >= score_threshold are included in the digest.
+
+evaluator:
+  backend:
+    type: claude
+    model: claude-haiku-4-5-20251001   # fast and cheap; switch to claude-sonnet-4-6 for higher quality
+    temperature: 0.1
+    max_tokens: 512
+    # For openai_compat, also set:
+    # base_url: http://localhost:1234/v1   # overrides OPENAI_COMPAT_BASE_URL
+  strategy:
+    type: relevance_json
+  score_threshold: 0.6
+
+# --- Email digest ---
+email:
+  smtp_host: smtp.gmail.com
+  smtp_port: 587              # 587 = STARTTLS, 465 = SSL
+  smtp_user: your.address@gmail.com
+  from_addr: your.address@gmail.com
+  to_addrs:
+    - digest@youraddress.com  # where digests are delivered
+  send_hour: 8                # 24h local time, digest sent once daily
+
+# --- Scheduler ---
+scheduler:
+  poll_interval_hours: 2     # how often to check RSS feeds

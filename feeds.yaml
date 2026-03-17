@@ -1,0 +1,92 @@
+# RSS feed list for PaperBreakfast
+#
+# Fields:
+#   url     — RSS feed URL (verify these are current; publishers occasionally change them)
+#   name    — Display name used in the digest
+#   group   — Logical grouping (for future filtering)
+#   enabled — Set to false to temporarily skip a feed without deleting it
+#
+# How to find RSS URLs:
+#   Cell Press:  https://www.cell.com/{journal}/inpress.rss  (ahead of print, most timely)
+#   Nature:      https://www.nature.com/{abbreviation}.rss
+#   Science.org: https://www.science.org/rss/{journal}.xml
+
+feeds:
+
+  # ── Cell Press ──────────────────────────────────────────────────────────────
+  - url: https://www.cell.com/cell/inpress.rss
+    name: Cell
+    group: cell-press
+    enabled: true
+
+  - url: https://www.cell.com/cell-stem-cell/inpress.rss
+    name: Cell Stem Cell
+    group: cell-press
+    enabled: true
+
+  - url: https://www.cell.com/immunity/inpress.rss
+    name: Immunity
+    group: cell-press
+    enabled: true
+
+  - url: https://www.cell.com/cancer-cell/inpress.rss
+    name: Cancer Cell
+    group: cell-press
+    enabled: true
+
+  - url: https://www.cell.com/cell-reports-medicine/inpress.rss
+    name: Cell Reports Medicine
+    group: cell-press
+    enabled: true
+
+  - url: https://www.cell.com/molecular-cell/inpress.rss
+    name: Molecular Cell
+    group: cell-press
+    enabled: true
+
+  # ── Nature family ────────────────────────────────────────────────────────────
+  - url: https://www.nature.com/nature.rss
+    name: Nature
+    group: nature
+    enabled: true
+
+  - url: https://www.nature.com/nm.rss
+    name: Nature Medicine
+    group: nature
+    enabled: true
+
+  - url: https://www.nature.com/nbt.rss
+    name: Nature Biotechnology
+    group: nature
+    enabled: true
+
+  - url: https://www.nature.com/ncb.rss
+    name: Nature Cell Biology
+    group: nature
+    enabled: true
+
+  - url: https://www.nature.com/nmeth.rss
+    name: Nature Methods
+    group: nature
+    enabled: true
+
+  - url: https://www.nature.com/ncomms.rss
+    name: Nature Communications
+    group: nature
+    enabled: true
+
+  # ── Science family ───────────────────────────────────────────────────────────
+  - url: https://www.science.org/action/showFeed?type=etoc&feed=rss&jc=science
+    name: Science
+    group: science
+    enabled: true
+
+  - url: https://www.science.org/rss/stm.xml
+    name: Science Translational Medicine
+    group: science
+    enabled: true
+
+  - url: https://www.science.org/rss/advances.xml
+    name: Science Advances
+    group: science
+    enabled: true
