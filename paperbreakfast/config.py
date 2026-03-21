@@ -40,6 +40,8 @@ class EvaluatorConfig:
     backend: BackendConfig
     strategy: StrategyConfig
     score_threshold: float = 0.6
+    use_batch: bool = False   # True = Anthropic Batch API (50% cost, async ~minutes)
+    chunk_size: int = 25      # Papers per LLM call (1 = sequential, 25 = default efficient)
 
 
 @dataclass
@@ -65,6 +67,7 @@ class AppConfig:
     scheduler: SchedulerConfig
     interest_profile: str
     db_path: str = "paperbreakfast.db"
+    proxy_base_url: Optional[str] = None   # e.g. "libproxy2.usc.edu"
     # Secrets — loaded from env, never stored in YAML
     anthropic_api_key: Optional[str] = None
     smtp_password: Optional[str] = None
@@ -104,6 +107,8 @@ def load_config(
         backend=BackendConfig(**backend_raw),
         strategy=StrategyConfig(**strategy_raw),
         score_threshold=float(ev.get("score_threshold", 0.6)),
+        use_batch=bool(ev.get("use_batch", False)),
+        chunk_size=int(ev.get("chunk_size", 25)),
     )
 
     # Email
@@ -150,6 +155,7 @@ def load_config(
         scheduler=scheduler,
         interest_profile=interest_profile,
         db_path=raw.get("db_path", "paperbreakfast.db"),
+        proxy_base_url=raw.get("proxy_base_url") or None,
         anthropic_api_key=os.environ.get("ANTHROPIC_API_KEY"),
         smtp_password=os.environ.get("SMTP_PASSWORD"),
         openai_compat_api_key=os.environ.get("OPENAI_COMPAT_API_KEY", "local"),

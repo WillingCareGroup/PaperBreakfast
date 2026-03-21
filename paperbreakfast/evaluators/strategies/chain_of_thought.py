@@ -5,6 +5,10 @@ Produces richer, more auditable reasoning. Slightly more tokens / slower.
 Good for: diagnosing why certain papers are (or aren't) being recommended,
 tuning the interest profile, or when using a smaller local model that
 benefits from explicit reasoning steps.
+
+Note: This strategy uses a legacy numeric score format (SCORE: 0.0-1.0)
+which is mapped to triage labels at parse time. For new deployments,
+prefer relevance_json which uses the native triage format.
 """
 import re
 
@@ -41,6 +45,10 @@ USER_TEMPLATE = """\
 Evaluate step-by-step, then end with SCORE: <0.0–1.0>\
 """
 
+# Score thresholds for triage mapping (must match keyword.py)
+_READ_THRESHOLD = 0.8
+_SKIM_THRESHOLD = 0.6
+
 
 class ChainOfThoughtStrategy(EvaluationStrategy):
 
@@ -62,22 +70,35 @@ class ChainOfThoughtStrategy(EvaluationStrategy):
         match = re.search(r'SCORE:\s*([0-9]*\.?[0-9]+)', raw_response, re.IGNORECASE)
         if not match:
             return EvaluationResult(
-                score=0.0,
-                reasoning="No SCORE line found in LLM response.",
+                triage="skip",
                 raw_response=raw_response,
                 parse_error=True,
             )
 
-        score = float(match.group(1))
-        score = max(0.0, min(1.0, score))
+        score = max(0.0, min(1.0, float(match.group(1))))
+
+        if score >= _READ_THRESHOLD:
+            triage = "read"
+        elif score >= _SKIM_THRESHOLD:
+            triage = "skim"
+        else:
+            triage = "skip"
 
         # Everything before SCORE: is the reasoning
-        reasoning = raw_response[: match.start()].strip()
-        if not reasoning:
-            reasoning = "No reasoning provided."
+        reasoning = raw_response[:match.start()].strip() or "No reasoning provided."
+
+        summary = None
+        if triage != "skip":
+            summary = {
+                "problem": "(not determinable from abstract)",
+                "model": "N/A — not stated in abstract",
+                "finding": reasoning[:400],
+                "impact": f"Chain-of-thought score: {score:.2f}",
+            }
 
         return EvaluationResult(
-            score=score,
-            reasoning=reasoning,
+            triage=triage,
+            milestone=False,
+            summary=summary,
             raw_response=raw_response,
         )

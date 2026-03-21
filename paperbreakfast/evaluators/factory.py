@@ -27,6 +27,14 @@ class CompositeEvaluator(Evaluator):
     def name(self) -> str:
         return f"{self._backend.name}/{self._strategy.name}"
 
+    @property
+    def strategy(self):
+        return self._strategy
+
+    @property
+    def backend(self):
+        return self._backend
+
     def evaluate(self, paper, interest_profile: str) -> EvaluationResult:
         system_prompt, user_prompt = self._strategy.build_prompts(paper, interest_profile)
         raw = self._backend.complete(system_prompt, user_prompt)

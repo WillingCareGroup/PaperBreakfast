@@ -21,11 +21,12 @@ if TYPE_CHECKING:
 
 @dataclass
 class EvaluationResult:
-    score: float           # 0.0 (irrelevant) → 1.0 (highly relevant)
-    reasoning: str         # human-readable explanation
-    raw_response: str = "" # raw LLM output, preserved for debugging
+    triage: str            # "read" | "skim" | "horizon" | "skip"
+    milestone: bool = False          # True = paradigm-shifting advance
+    summary: dict | None = None      # {problem, model, finding, impact} or None for skip
+    raw_response: str = ""           # raw LLM output, preserved for debugging
     evaluator_name: str = ""
-    parse_error: bool = False  # True when score defaulted to 0.0 due to parse failure
+    parse_error: bool = False        # True when triage defaulted to "skip" due to parse failure
 
 
 class BackendError(Exception):
@@ -71,7 +72,7 @@ class EvaluationStrategy(ABC):
     def parse_response(self, raw_response: str) -> EvaluationResult:
         """
         Parse raw LLM output into a structured EvaluationResult.
-        MUST NOT raise — return EvaluationResult(score=0.0, parse_error=True) on failure.
+        MUST NOT raise — return EvaluationResult(triage='skip', parse_error=True) on failure.
         """
 
 

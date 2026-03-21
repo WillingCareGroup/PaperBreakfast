@@ -14,8 +14,10 @@ SQLite (peewee) — dedup by GUID
 Evaluator — modular backend × strategy
     │  Backends:  Claude API | LM Studio | Ollama | Keyword (no LLM)
     │  Strategies: relevance_json | chain_of_thought
+    │  Triage:    read | horizon | skim | skip
     ↓
 Daily HTML email digest (Jinja2 + smtplib)
+    Read → On the Horizon → Skim
 ```
 
 Backends and strategies are independent — swap either in `config.yaml` with no code changes.
@@ -109,8 +111,8 @@ Note which ones fail and update `feeds.yaml` as needed.
 python main.py eval
 ```
 
-Runs 15 hand-labeled papers through the evaluator and reports MAE, precision, recall, F1.
-Expect MAE ~0.25–0.35 with the keyword backend. This is your baseline.
+Runs 15 hand-labeled papers through the evaluator and reports precision, recall, F1.
+This is your baseline — expect moderate precision with the keyword backend.
 
 ### 7. Test email delivery
 
@@ -134,7 +136,7 @@ Update `config.yaml`:
 evaluator:
   backend:
     type: claude
-    model: claude-haiku-4-5-20251001    # fast and cheap (~$1-3/month for this workload)
+    model: claude-sonnet-4-6            # recommended; use haiku-4-5-20251001 for lower cost
   strategy:
     type: relevance_json
 ```
@@ -145,7 +147,7 @@ Re-run the benchmark to see the improvement:
 python main.py eval
 ```
 
-Expect MAE ~0.10–0.15 and recall 85%+.
+Expect clear improvement in precision and recall over the keyword baseline.
 
 ### 9. Local LLM (LM Studio or Ollama)
 
@@ -180,7 +182,7 @@ Polls feeds every 2 hours, sends digest daily at 8:00 UTC (adjust `send_hour` in
 | `python main.py status` | Show database statistics |
 | `python main.py feeds` | List configured feeds |
 | `python main.py eval` | Benchmark evaluator against ground truth |
-| `python main.py feedback list` | Show recent papers by score |
+| `python main.py feedback` | Show recent evaluated papers with triage and feedback |
 | `python main.py feedback <guid> good\|noise\|missed` | Record relevance feedback |
 
 All commands accept `--verbose` / `-v` for debug logging.
@@ -197,8 +199,9 @@ and explicit about what you don't.
 
 ### Score threshold
 
-In `config.yaml`, `score_threshold: 0.6` controls the cutoff for the digest.
-After the first week, use feedback to label papers and re-run `eval` to calibrate.
+Triage controls digest inclusion — papers labelled `read`, `skim`, or `horizon` are included.
+`score_threshold` in `config.yaml` is only used by the `eval` benchmark to define what counts
+as "relevant" when computing precision and recall against your ground truth labels.
 
 ### Adding feeds
 
@@ -230,8 +233,8 @@ Run `python main.py eval` to benchmark before committing to a change.
 
 | Strategy | Output format | Best for |
 |---|---|---|
-| `relevance_json` | `{"score": 0.8, "reasoning": "..."}` | Fast, structured, default |
-| `chain_of_thought` | Step-by-step → `SCORE: 0.8` | Diagnosing why papers are/aren't recommended |
+| `relevance_json` | `{"triage": "read", "milestone": false, "summary": {...}}` | Structured triage with summaries, default |
+| `chain_of_thought` | Step-by-step → `SCORE: 0.8` | Diagnosing why papers are/aren't recommended (legacy) |
 
 ---
 

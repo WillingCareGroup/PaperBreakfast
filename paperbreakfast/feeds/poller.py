@@ -24,10 +24,16 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class PollResult:
-    feeds_polled: int = 0
+    feeds_total: int = 0    # total enabled feeds attempted
+    feeds_ok: int = 0       # feeds that returned without error
     total_fetched: int = 0
     total_new: int = 0
     errors: list = field(default_factory=list)
+
+    @property
+    def feeds_polled(self) -> int:
+        """Back-compat alias."""
+        return self.feeds_ok
 
 
 class FeedPoller:
@@ -36,11 +42,11 @@ class FeedPoller:
         self._feeds = [f for f in feeds if f.enabled]
 
     def poll_all(self) -> PollResult:
-        result = PollResult()
+        result = PollResult(feeds_total=len(self._feeds))
         for feed in self._feeds:
             try:
                 fetched, new = self._poll_one(feed)
-                result.feeds_polled += 1
+                result.feeds_ok += 1
                 result.total_fetched += fetched
                 result.total_new += new
                 if new:
@@ -48,8 +54,8 @@ class FeedPoller:
                 else:
                     logger.debug(f"  [{feed.name}] {fetched} fetched, none new")
             except Exception as exc:
-                msg = f"Error polling '{feed.name}' ({feed.url}): {exc}"
-                logger.error(msg)
+                msg = f"[{feed.name}] {exc}"
+                logger.error(f"Error polling '{feed.name}' ({feed.url}): {exc}")
                 result.errors.append(msg)
         return result
 
@@ -78,6 +84,7 @@ class FeedPoller:
                     "authors": self._extract_authors(entry),
                     "published_date": self._extract_date(entry),
                     "fetched_at": datetime.utcnow(),
+                    "doi": self._extract_doi(entry),
                 },
             )
             if created:
@@ -109,10 +116,19 @@ class FeedPoller:
             raw = entry.description
         return self._strip_html(raw).strip()
 
+    def _extract_doi(self, entry) -> str | None:
+        for field in ("dc_identifier", "prism_doi"):
+            val = entry.get(field, "")
+            if val:
+                val = val.replace("doi:", "").strip().rstrip(".,;)")
+                if val.startswith("10."):
+                    return val
+        return None
+
     def _extract_authors(self, entry) -> str:
         if entry.get("authors"):
             names = [a.get("name", "") for a in entry.authors if a.get("name")]
-            return ", ".join(names[:10])
+            return ", ".join(names)
         if entry.get("author"):
             return entry.author
         return ""

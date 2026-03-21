@@ -21,74 +21,140 @@
       color: white;
       border-radius: 10px;
       padding: 28px 32px;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
     }
     .header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
-    .header .subtitle { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 3px; }
-    .stats { display: flex; gap: 28px; margin-top: 20px; }
-    .stat .num { font-size: 30px; font-weight: 700; color: #e94560; }
-    .stat .label {
-      font-size: 10px; text-transform: uppercase;
-      letter-spacing: 1.2px; color: rgba(255,255,255,0.4);
+    .header-date {
+      font-size: 12px; font-weight: 600;
+      color: rgba(255,255,255,0.5);
+      white-space: nowrap;
     }
+    /* Triage counts — primary stats, right side of banner */
+    .triage-stats { text-align: right; }
+    .triage-stat { display: inline-block; margin-left: 28px; }
+    .triage-stat .big-num {
+      font-size: 36px; font-weight: 700; line-height: 1;
+    }
+    .triage-stat .big-label {
+      font-size: 9px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.4px;
+      color: rgba(255,255,255,0.45); margin-top: 3px;
+    }
+    .num-read    { color: #27ae60; }
+    .num-horizon { color: #9b7fe8; }
+    .num-skim    { color: #f39c12; }
+    /* Status corner — small secondary stats, bottom-left */
+    .status-corner { margin-top: 20px; }
+    .status-item {
+      display: inline-block; margin-right: 20px;
+      font-size: 11px; color: rgba(255,255,255,0.45);
+    }
+    .status-item strong {
+      font-weight: 700; color: rgba(255,255,255,0.75);
+    }
+    .status-item.feeds-ok strong   { color: #27ae60; }
+    .status-item.feeds-warn strong { color: #e94560; }
 
-    /* ── Journal sections ── */
-    .journal-section { margin-bottom: 32px; }
-    .journal-header {
-      font-size: 10px; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 1.5px;
-      color: #999; padding-bottom: 8px;
-      border-bottom: 1px solid #dde2ed;
-      margin-bottom: 12px;
+    /* ── Section dividers ── */
+    .section-divider {
+      padding: 20px 2px 6px 2px;
+      margin-bottom: 4px;
+    }
+    .section-label {
+      font-size: 9px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 2px;
+      color: #bbb;
     }
 
     /* ── Paper cards ── */
     .paper-card {
       background: white;
       border-radius: 8px;
-      padding: 18px 20px;
+      padding: 16px 20px;
       margin-bottom: 10px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.07);
       border-left: 4px solid #ccc;
     }
-    .paper-card.tier-high   { border-left-color: #27ae60; }
-    .paper-card.tier-mid    { border-left-color: #f39c12; }
-    .paper-card.tier-low    { border-left-color: #bdc3c7; }
+    .paper-card.tier-read    { border-left-color: #27ae60; }
+    .paper-card.tier-horizon { border-left-color: #7e57c2; }
+    .paper-card.tier-skim    { border-left-color: #f39c12; }
 
-    .card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 8px;
+    /* Journal label + triage badge row */
+    .card-top { margin-bottom: 7px; }
+    .journal-label {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.2px;
+      color: #aaa;
     }
-    .authors {
-      font-size: 11px; color: #aaa;
-      flex: 1; min-width: 0;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .score-badge {
-      font-size: 13px; font-weight: 700;
+    .triage-badge {
+      font-size: 11px; font-weight: 700;
       padding: 2px 9px; border-radius: 20px;
-      flex-shrink: 0;
+      text-transform: uppercase; letter-spacing: 0.8px;
+      white-space: nowrap; display: inline-block;
     }
-    .score-badge.tier-high { background: #eafaf1; color: #27ae60; }
-    .score-badge.tier-mid  { background: #fef9e7; color: #d68910; }
-    .score-badge.tier-low  { background: #f4f5f7; color: #95a5a6; }
+    .triage-badge.tier-read    { background: #eafaf1; color: #27ae60; }
+    .triage-badge.tier-horizon { background: #ede7f6; color: #4527a0; }
+    .triage-badge.tier-skim    { background: #fef9e7; color: #d68910; }
+    .milestone-badge {
+      font-size: 11px; font-weight: 700;
+      padding: 2px 9px; border-radius: 20px;
+      background: #fdf2d0; color: #9a6f00;
+      white-space: nowrap; display: inline-block;
+      margin-left: 4px;
+    }
 
+    /* Title */
     .paper-title {
       font-size: 15px; font-weight: 600;
-      line-height: 1.4; margin-bottom: 8px;
+      line-height: 1.4; margin-bottom: 7px;
     }
     .paper-title a { color: #1a1a2e; text-decoration: none; }
     .paper-title a:hover { color: #e94560; text-decoration: underline; }
 
-    .reasoning {
-      font-size: 12.5px; color: #777;
-      border-top: 1px solid #f0f2f7;
-      padding-top: 8px; margin-top: 8px;
-      font-style: italic;
+    /* Tags */
+    .tags { margin-bottom: 7px; }
+    .tag {
+      font-size: 10px; font-weight: 600;
+      padding: 2px 8px; border-radius: 12px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      display: inline-block; margin-right: 4px; margin-bottom: 3px;
     }
+
+    /* Author + institution meta */
+    .meta-line {
+      font-size: 11px; color: #999;
+      margin-bottom: 7px;
+    }
+    .meta-author { font-weight: 600; color: #555; }
+    .meta-sep { margin: 0 5px; color: #ddd; }
+
+    /* Summary block */
+    .summary-block {
+      border-top: 1px solid #f0f2f7;
+      padding-top: 10px; margin-top: 6px;
+    }
+    .summary-row {
+      display: flex;
+      font-size: 12.5px;
+      margin-bottom: 5px;
+      line-height: 1.45;
+    }
+    .summary-label {
+      font-size: 9px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; color: #bbb;
+      min-width: 58px; padding-top: 2px; flex-shrink: 0;
+    }
+    .summary-label.transfer { color: #9c7fc7; }
+    .summary-text { color: #555; }
+
+    /* Read link */
+    .read-link {
+      display: inline-block;
+      font-size: 11.5px; font-weight: 600;
+      color: #e94560; text-decoration: none;
+      margin-top: 10px;
+    }
+    .read-link:hover { text-decoration: underline; }
 
     /* ── Footer ── */
     .footer {
@@ -101,56 +167,211 @@
   <div class="container">
 
     <div class="header">
-      <h1>PaperBreakfast</h1>
-      <div class="subtitle">{{ date }}</div>
-      <div class="stats">
-        <div class="stat">
-          <div class="num">{{ total_papers }}</div>
-          <div class="label">Papers</div>
-        </div>
-        <div class="stat">
-          <div class="num">{{ journals | length }}</div>
-          <div class="label">Journals</div>
-        </div>
+      <!-- Triage counts left, title + date right -->
+      <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+        <tr>
+          <td style="vertical-align:middle;">
+            <div class="triage-stats" style="text-align:left;">
+              <div class="triage-stat" style="margin-left:0; margin-right:28px;">
+                <div class="big-num num-read">{{ read_count }}</div>
+                <div class="big-label">Read</div>
+              </div>
+              <div class="triage-stat" style="margin-left:0; margin-right:28px;">
+                <div class="big-num num-horizon">{{ horizon_count }}</div>
+                <div class="big-label">Horizon</div>
+              </div>
+              <div class="triage-stat" style="margin-left:0;">
+                <div class="big-num num-skim">{{ skim_count }}</div>
+                <div class="big-label">Skim</div>
+              </div>
+            </div>
+          </td>
+          <td style="vertical-align:top; text-align:right; white-space:nowrap; padding-left:16px;">
+            <h1>PaperBreakfast</h1>
+            <div class="header-date" style="margin-top:4px;">{{ date }}</div>
+          </td>
+        </tr>
+      </table>
+      <!-- Status corner: secondary stats -->
+      <div class="status-corner">
+        <span class="status-item">
+          <strong>{{ recommended_count }}/{{ total_papers_today }}</strong> recommended
+        </span>
+        {% if feeds_total %}
+        <span class="status-item {% if feed_errors %}feeds-warn{% else %}feeds-ok{% endif %}">
+          <strong>{% if feeds_ok is not none %}{{ feeds_ok }}{% else %}?{% endif %}/{{ feeds_total }}</strong> feeds{% if feed_errors %} &#9888;{% endif %}
+        </span>
+        {% endif %}
       </div>
     </div>
 
-    {% for journal_name, papers in journals %}
-    <div class="journal-section">
-      <div class="journal-header">
-        {{ journal_name }} &mdash; {{ papers | length }} paper{{ 's' if papers | length != 1 else '' }}
-      </div>
+    {# ── Macro: render one paper card ─────────────────────────────────────── #}
+    {% macro render_card(paper, tags, summary) %}
+      {% set tier = paper.triage or "skim" %}
 
-      {% for paper in papers | sort(attribute='score', reverse=True) %}
-        {% set score_pct = ((paper.score or 0) * 100) | int %}
-        {% if (paper.score or 0) >= 0.75 %}
-          {% set tier = "high" %}
-        {% elif (paper.score or 0) >= 0.5 %}
-          {% set tier = "mid" %}
-        {% else %}
-          {% set tier = "low" %}
+      {# Use enriched PI name; fall back to last stored author (senior author convention) #}
+      {% if paper.pi_name %}
+        {% set display_author = paper.pi_name %}
+      {% elif paper.authors %}
+        {% set author_list = paper.authors.split(',') %}
+        {% set display_author = author_list[-1].strip() %}
+      {% else %}
+        {% set display_author = 'Unknown' %}
+      {% endif %}
+
+      <div class="paper-card tier-{{ tier }}">
+
+        <!-- Journal label + triage badge — table for reliable alignment -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin-bottom:7px;">
+          <tr>
+            <td style="vertical-align:middle;">
+              <span class="journal-label">{{ paper.journal }}</span>
+            </td>
+            <td style="white-space:nowrap; padding-left:12px; vertical-align:middle; text-align:right;">
+              <span class="triage-badge tier-{{ tier }}">{{ tier }}</span>
+              {% if paper.milestone %}
+                <span class="milestone-badge">&#9733; Milestone</span>
+              {% endif %}
+            </td>
+          </tr>
+        </table>
+
+        <!-- Title -->
+        <div class="paper-title">
+          <a href="{{ paper.url | proxy_url }}" target="_blank" rel="noopener">{{ paper.title }}</a>
+        </div>
+
+        <!-- Tags -->
+        {% if tags %}
+        <div class="tags">
+          {% for tag in tags %}
+            {% if tag == 'HSC/HSPC' %}
+              <span class="tag" style="background:#d6eaf8; color:#1a6fa0;">{{ tag }}</span>
+            {% elif tag == 'CAR-T' %}
+              <span class="tag" style="background:#e8daef; color:#6c3483;">{{ tag }}</span>
+            {% elif tag == 'CAR-NK' %}
+              <span class="tag" style="background:#e0d0f0; color:#5b2c6f;">{{ tag }}</span>
+            {% elif tag == 'Gene Editing' %}
+              <span class="tag" style="background:#d1f2eb; color:#0e6655;">{{ tag }}</span>
+            {% elif tag == 'Gene Therapy' %}
+              <span class="tag" style="background:#d5f5e3; color:#1e8449;">{{ tag }}</span>
+            {% elif tag == 'iPSC' %}
+              <span class="tag" style="background:#fde8ef; color:#a93226;">{{ tag }}</span>
+            {% elif tag == 'Allogeneic' %}
+              <span class="tag" style="background:#fef0d9; color:#a04000;">{{ tag }}</span>
+            {% elif tag == 'HSCT' %}
+              <span class="tag" style="background:#fadbd8; color:#922b21;">{{ tag }}</span>
+            {% elif tag == 'Manufacturing' %}
+              <span class="tag" style="background:#fef9e7; color:#9a7d0a;">{{ tag }}</span>
+            {% elif tag == 'AI/Protein Design' %}
+              <span class="tag" style="background:#d6dbdf; color:#212f3d;">{{ tag }}</span>
+            {% elif tag == 'Milestone' %}
+              <span class="tag" style="background:#fdf2d0; color:#9a6f00;">{{ tag }}</span>
+            {% else %}
+              <span class="tag" style="background:#f0f0f0; color:#666;">{{ tag }}</span>
+            {% endif %}
+          {% endfor %}
+        </div>
         {% endif %}
 
-        <div class="paper-card tier-{{ tier }}">
-          <div class="card-top">
-            <div class="authors">
-              {{ paper.authors[:120] if paper.authors else 'Unknown authors' }}
-              {{ '&hellip;' if paper.authors and paper.authors | length > 120 else '' }}
-            </div>
-            <div class="score-badge tier-{{ tier }}">{{ score_pct }}%</div>
-          </div>
-
-          <div class="paper-title">
-            <a href="{{ paper.url }}" target="_blank" rel="noopener">{{ paper.title }}</a>
-          </div>
-
-          {% if paper.reasoning %}
-          <div class="reasoning">{{ paper.reasoning }}</div>
+        <!-- PI · Institution · Published date -->
+        <div class="meta-line">
+          <span class="meta-author">{{ display_author }}</span>
+          <span class="meta-sep">&middot;</span>
+          {% if paper.institution %}
+            {{ paper.institution }}
+          {% else %}
+            <span style="color:#ccc;">&#127963; Institution unavailable</span>
+          {% endif %}
+          {% if paper.published_date %}
+            <span class="meta-sep">&middot;</span>{{ paper.published_date.strftime('%b %d, %Y') }}
           {% endif %}
         </div>
-      {% endfor %}
-    </div>
+
+        <!-- Structured summary -->
+        {% if summary %}
+        <div class="summary-block">
+          {% if summary.problem %}
+          <div class="summary-row">
+            <span class="summary-label">Problem</span>
+            <span class="summary-text">{{ summary.problem }}</span>
+          </div>
+          {% endif %}
+          {% if summary.model %}
+          <div class="summary-row">
+            <span class="summary-label">Model</span>
+            <span class="summary-text">{{ summary.model }}</span>
+          </div>
+          {% endif %}
+          {% if summary.finding %}
+          <div class="summary-row">
+            <span class="summary-label">Finding</span>
+            <span class="summary-text">{{ summary.finding }}</span>
+          </div>
+          {% endif %}
+          {% if summary.impact %}
+          <div class="summary-row">
+            <span class="summary-label" {% if tier == 'skim' %}style="color:#d68910;"{% endif %}>{% if tier == 'skim' %}Focus{% else %}Impact{% endif %}</span>
+            <span class="summary-text">{{ summary.impact }}</span>
+          </div>
+          {% endif %}
+          {% if summary.transfer %}
+          <div class="summary-row">
+            <span class="summary-label transfer">Transfer</span>
+            <span class="summary-text">{{ summary.transfer }}</span>
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <a href="{{ paper.url | proxy_url }}" class="read-link" target="_blank" rel="noopener">Read paper &rarr;</a>
+
+      </div>
+    {% endmacro %}
+
+    {# ── Read section ──────────────────────────────────────────────────────── #}
+    {% if read_papers %}
+    <div class="section-divider"><span class="section-label">Read</span></div>
+    {% for paper in read_papers %}
+      {{ render_card(paper, paper_tags.get(paper.guid, []), paper_summaries.get(paper.guid)) }}
     {% endfor %}
+    {% endif %}
+
+    {# ── Horizon section ───────────────────────────────────────────────────── #}
+    {% if horizon_papers %}
+    <div class="section-divider"><span class="section-label">On the Horizon</span></div>
+    {% for paper in horizon_papers %}
+      {{ render_card(paper, paper_tags.get(paper.guid, []), paper_summaries.get(paper.guid)) }}
+    {% endfor %}
+    {% endif %}
+
+    {# ── Skim section ──────────────────────────────────────────────────────── #}
+    {% if skim_papers %}
+    <div class="section-divider"><span class="section-label">Skim</span></div>
+    {% for paper in skim_papers %}
+      {{ render_card(paper, paper_tags.get(paper.guid, []), paper_summaries.get(paper.guid)) }}
+    {% endfor %}
+    {% endif %}
+
+    {% if feed_errors or eval_errors %}
+    <div style="background:#fff5f5; border:1px solid #fcc; border-radius:8px; padding:14px 18px; margin-bottom:16px;">
+      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#c0392b; margin-bottom:8px;">
+        &#9888; Errors — action may be needed
+      </div>
+      {% if feed_errors %}
+      <div style="font-size:11px; color:#555; margin-bottom:6px; font-weight:600;">Feed errors ({{ feed_errors|length }}):</div>
+      {% for err in feed_errors %}
+        <div style="font-size:11px; color:#777; margin-bottom:3px; font-family:monospace;">{{ err }}</div>
+      {% endfor %}
+      {% endif %}
+      {% if eval_errors %}
+      <div style="font-size:11px; color:#555; margin-top:8px; margin-bottom:6px; font-weight:600;">Evaluation errors ({{ eval_errors|length }}):</div>
+      {% for err in eval_errors %}
+        <div style="font-size:11px; color:#777; margin-bottom:3px; font-family:monospace;">{{ err }}</div>
+      {% endfor %}
+      {% endif %}
+    </div>
+    {% endif %}
 
     <div class="footer">
       PaperBreakfast &mdash; {{ date }}

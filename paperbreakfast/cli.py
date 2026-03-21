@@ -57,7 +57,7 @@ def cmd_fetch(args, config):
     p = Pipeline(config)
     poll = p.run_poll()
     console.print(
-        f"  Polled [green]{poll.feeds_polled}[/] feeds — "
+        f"  Polled [green]{poll.feeds_ok}/{poll.feeds_total}[/] feeds OK — "
         f"[green]{poll.total_new}[/] new papers"
     )
     for err in poll.errors:
@@ -68,6 +68,10 @@ def cmd_fetch(args, config):
         f"  Evaluated [green]{ev.evaluated}[/] papers"
         + (f", [red]{ev.errors} errors[/]" if ev.errors else "")
     )
+
+    enriched = p.run_enrichment()
+    if enriched:
+        console.print(f"  Enriched [green]{enriched}[/] papers with PI/institution")
 
 
 def cmd_digest(args, config):
@@ -86,11 +90,14 @@ def cmd_status(args, config):
     from paperbreakfast.models.db import DigestRun, Paper
 
     total = Paper.select().count()
-    evaluated = Paper.select().where(Paper.score.is_null(False)).count()
-    recommended = (
+    evaluated = Paper.select().where(Paper.triage.is_null(False)).count()
+    read_count   = Paper.select().where(Paper.triage == "read").count()
+    skim_count   = Paper.select().where(Paper.triage == "skim").count()
+    horizon_count = Paper.select().where(Paper.triage == "horizon").count()
+    recommended_unsent = (
         Paper.select()
         .where(
-            Paper.score >= config.evaluator.score_threshold,
+            Paper.triage.in_(["read", "skim", "horizon"]),
             Paper.included_in_digest == False,  # noqa: E712
         )
         .count()
@@ -104,10 +111,10 @@ def cmd_status(args, config):
     t.add_row("Total papers in DB", str(total))
     t.add_row("Evaluated", str(evaluated))
     t.add_row("Pending evaluation", str(total - evaluated))
-    t.add_row(
-        f"Recommended (score >= {config.evaluator.score_threshold:.0%}), unsent",
-        str(recommended),
-    )
+    t.add_row("  — read", str(read_count))
+    t.add_row("  — skim", str(skim_count))
+    t.add_row("  — horizon", str(horizon_count))
+    t.add_row("Recommended (read/skim/horizon), unsent", str(recommended_unsent))
     t.add_row("Sent in past digests", str(sent))
     t.add_row("Digest runs recorded", str(digests))
     t.add_row("Active evaluator", _evaluator_name(config))
@@ -121,7 +128,7 @@ def cmd_feeds(args, config):
     t.add_column("On", justify="center")
     t.add_column("URL", style="dim")
     for feed in config.feeds:
-        t.add_row(feed.name, feed.group, "[green]✓[/]" if feed.enabled else "[red]✗[/]", feed.url)
+        t.add_row(feed.name, feed.group, "[green]Y[/]" if feed.enabled else "[red]N[/]", feed.url)
     console.print(t)
 
 
@@ -141,12 +148,12 @@ def cmd_feedback(args, config):
         limit = getattr(args, "limit", 20)
         papers = (
             Paper.select()
-            .where(Paper.score.is_null(False))
-            .order_by(Paper.score.desc())
+            .where(Paper.triage.is_null(False))
+            .order_by(Paper.evaluated_at.desc())
             .limit(limit)
         )
-        t = Table(title=f"Recent evaluated papers (top {limit} by score)")
-        t.add_column("Score", justify="right", width=6)
+        t = Table(title=f"Recent evaluated papers (latest {limit})")
+        t.add_column("Triage", width=8)
         t.add_column("Feedback", width=8)
         t.add_column("Journal", width=20)
         t.add_column("Title", max_width=50)
@@ -154,8 +161,12 @@ def cmd_feedback(args, config):
         for p in papers:
             fb = p.user_feedback or "-"
             fb_color = {"good": "green", "noise": "red", "missed": "yellow"}.get(fb, "dim")
+            triage_color = {
+                "read": "green", "skim": "yellow",
+                "horizon": "magenta", "skip": "dim",
+            }.get(p.triage or "", "dim")
             t.add_row(
-                f"{p.score:.2f}",
+                f"[{triage_color}]{p.triage or '-'}[/]",
                 f"[{fb_color}]{fb}[/]",
                 p.journal,
                 p.title[:50],

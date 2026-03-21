@@ -1,37 +1,24 @@
 # Session Handoff
 
-**Last updated:** 2026-03-16
-**Session:** Initial build + dev practices + bug fixes + README + first push to GitHub
+**Last updated:** 2026-03-21
+**Session:** Haiku→Sonnet migration, evaluator_model tracking, digest header redesign, enrichment improvements
 
 ---
 
 ## What happened this session
 
-### Phase 1 — Core system
-Full PaperBreakfast codebase built from scratch:
-- RSS ingestion, SQLite storage, modular evaluator (backend × strategy), email digest, CLI, APScheduler daemon
-
-### Phase 2 — Dev practices layer
-- `CLAUDE.md` — standing instructions, scope guard, regression notes
-- `docs/devlog.md` — all decisions documented retroactively
-- `docs/invariants.md` — 11 hard constraints
-- `.claude/commands/` — `/adr`, `/log`, `/handoff` slash commands
-- `eval/ground_truth.jsonl` — 15 labeled papers for benchmarking
-- `paperbreakfast/eval.py` — eval runner with MAE / precision / recall / F1
-- `user_feedback` field on Paper model
-
-### Phase 3 — Code review + bug fixes
-Six bugs fixed before first run:
-1. GUID dedup used unstable `hash()` → replaced with `hashlib.sha256`
-2. CLI `feedback` argparse conflict → simplified to positional args
-3. Regex `self.renewal` matched any char → fixed to `self-renewal`
-4. SMTP socket leaked on exception → added `try/finally`
-5. Parse errors were silent → added WARNING log in pipeline
-6. Empty interest profile was silent → added runtime warning in config loader
-
-### Phase 4 — Wrap-up
-- `README.md` written with full setup guide and CLI reference
-- All changes committed and pushed to GitHub
+- **Cleanup from previous session** — deleted `prompt research/` directory (3 files, all content integrated); updated README.md: removed MAE references, updated model to `claude-sonnet-4-6`, fixed output format description, score_threshold description, feedback command syntax, architecture diagram.
+- **Smoke tests** — all 6 functional tests passed (imports, keyword, chain_of_thought, relevance_json, DigestBuilder, EvalResult).
+- **Re-evaluation run** — 1590 papers were pending. Started accidentally with haiku 4.5 (old config), killed at 1525 evaluated. Updated `config.yaml` to sonnet 4.6 (`temperature: 0.0`, `chunk_size: 10`).
+- **`evaluator_model` field added** — new `CharField(null=True)` on `Paper` model with ALTER TABLE migration. `_save_evaluation()` in `pipeline.py` now writes `config.evaluator.backend.model` for every paper. Backfilled 1525 haiku papers with `claude-haiku-4-5-20251001`.
+- **Haiku vs Sonnet comparison** — reset 762 haiku papers for sonnet re-evaluation (random seed 42). Sonnet evaluated all 762 + ~120 new polled papers (883 total). Results: haiku 31.3% recommended (7.1% read, 12.5% skim, 11.8% horizon) vs sonnet 18.1% (2.7% read, 13.5% skim, 1.9% horizon). Haiku over-inflated horizon and read. Sonnet confirmed as correct model.
+- **Enrichment: PubMed-first** — swapped order: PubMed now runs first, Crossref as fallback. PubMed corresponding author detection: authors with `@` in affiliation are corresponding authors; first one wins. Falls back to last author if none marked. Previous code always used last author.
+- **Enrichment run** — 0 new papers enriched; all 17 unenriched papers are recent 2026 publications not yet indexed by PubMed. Will self-resolve.
+- **Feeds stat in standalone digest** — fixed: `feeds_total` now shows configured feed count (`len(config.feeds)`) even when no poll ran. Shows `?/48` in grey when poll data unavailable.
+- **Digest header redesign** — Read/Horizon/Skim counts (big, colored) on left; PaperBreakfast title + date top-right; status corner (small) bottom-left shows `recommended/total` and `feeds`. Removed journals stat.
+- **Skim "Focus" label** — skim cards now show `Impact` field labelled "Focus" in amber. Read/horizon cards keep "Impact" label. Template-only change, no prompt change.
+- **Prompt/profile approval rule established** — rolled back a v7 prompt attempt (article_type + focus fields). Rule: `relevance_json.py` and `profile.md` must not be edited without explicit user approval.
+- **Digest sent** — 24 papers to zhengpri@gmail.com. [VERIFIED]
 
 ---
 
@@ -39,74 +26,66 @@ Six bugs fixed before first run:
 
 | Component | Status |
 |---|---|
-| RSS ingestion (feedparser) | Written, untested end-to-end |
-| Evaluator — keyword | Written, can test immediately (no API key) |
-| Evaluator — Claude API | Written, needs `ANTHROPIC_API_KEY` |
-| Evaluator — LM Studio / Ollama | Written, needs local server |
-| Email digest | Written, needs SMTP config + Gmail app password |
-| Eval benchmark | Written, untested |
-| Feedback system | Written, untested |
-| Scheduler daemon | Written, untested |
+| RSS ingestion — 48 feeds | Working |
+| Evaluator — chunked Sonnet 4.6, v6 prompt | Working — confirmed on 883 papers |
+| `evaluator_model` field | Working — all papers labelled, new evals auto-tagged |
+| Triage system — 4 labels | Working |
+| Crossref/PubMed enrichment (PubMed-first) | Working — corresponding author detection active |
+| Email digest — 3-section template | Working — header redesigned, Focus label for skim |
+| Windows scheduled task | Running — weekdays 10AM |
+| Eval benchmark | Working — triage-based P/R/F1 |
+| Feedback system | Working |
+| keyword / chain_of_thought backends | Working |
 
-**Nothing has been run yet.** The first real test is Step 5 of the README.
+**Active config:** `backend: claude`, model `claude-sonnet-4-6`, `chunk_size: 10`, `temperature: 0.0`, `use_batch: false`
 
----
-
-## What's needed before first run
-
-1. `config.yaml` — copy from `config.example.yaml`, fill in email section
-2. `.env` — copy from `.env.example`, fill in `SMTP_PASSWORD` (and optionally `ANTHROPIC_API_KEY`)
-3. Dependencies installed — `pip install -e .` in a venv
+**Nothing blocking** — system is live and running.
 
 ---
 
-## Open questions to resolve on first run
+## Open questions / things to verify
 
-1. **Which RSS feeds are live?** — Cell Press `inpress.rss`, Science.org URLs are most likely to need adjustment. Run `python main.py fetch --verbose` and note which feeds return 0 entries or errors.
-
-2. **Gmail app password** — must be an App Password, not account password. See README Step 4.
-
-3. **Score threshold calibration** — 0.6 is a starting guess. After first week, label papers with `feedback` and re-run `eval` to find the right cutoff.
-
-4. **APScheduler timezone** — daemon uses UTC. `send_hour: 8` = 8 AM UTC. Adjust in `config.yaml` for your timezone (UTC+1 → set 7, UTC-5 → set 13, etc.).
-
-5. **DB migration** — if `paperbreakfast.db` was created in an earlier test before `user_feedback` field was added, delete it and let it recreate on next run.
+1. **Haiku papers still in DB** — 763 papers evaluated with haiku 4.5 remain tagged `evaluator_model = claude-haiku-4-5-20251001`. These will appear in future digests if they're within the 24h window and haven't been sent. Consider whether to re-evaluate them with sonnet. Query: `SELECT count(*) FROM papers WHERE evaluator_model='claude-haiku-4-5-20251001' AND triage IN ('read','skim','horizon') AND included_in_digest=0`.
+2. **2026 unenriched papers** — 17 papers lack institution (very recent, PubMed not indexed yet). Will self-resolve; run `python main.py fetch` in a week to pick them up.
+3. **Horizon rate with sonnet** — 1.9% vs haiku's 11.8%. Watch over the next week of live digests to confirm this feels right. May need prompt tuning if it seems too low.
+4. **Corresponding author coverage** — new PubMed-first enrichment with email detection untested on a large batch. Verify PI names look more accurate in the next digest.
+5. **Focus label for skim** — confirm it renders correctly in email client (amber "Focus" label).
 
 ---
 
 ## Recommended next steps
 
 ```bash
-# 1. Install
-cd PaperBreakfast
-python -m venv .venv && .venv\Scripts\activate
-pip install -e .
+# Normal daily operation — scheduled task handles this automatically
+# Manual run if needed:
+python main.py fetch        # poll + evaluate + enrich
+python main.py digest       # send
 
-# 2. Configure
-cp config.example.yaml config.yaml   # fill in email + start with backend: keyword
-cp .env.example .env                  # fill in SMTP_PASSWORD
-
-# 3. Test ingestion
-python main.py fetch --verbose
+# Check haiku papers still pending digest
 python main.py status
 
-# 4. Benchmark keyword evaluator
+# Label papers to grow ground truth (target 50+)
+python main.py feedback
+python main.py feedback <guid> good|noise|missed
+
+# Re-benchmark with sonnet
 python main.py eval
-
-# 5. Test email
-python main.py digest
-
-# 6. Switch to Claude, re-benchmark
-# (add ANTHROPIC_API_KEY to .env, change backend.type in config.yaml)
-python main.py eval
-
-# 7. Start daemon
-python main.py run
 ```
+
+**Longer term:**
+- Decide whether to re-evaluate the 763 haiku papers with sonnet (costs ~$0.50, cleans up the split DB)
+- Grow ground truth to 50+ papers for statistically meaningful eval
+- Consider article type detection once a reliable signal is found (RSS metadata, DOI prefix patterns)
+- Consider `focus` as a dedicated prompt field for skim (currently embedded in `impact`) — requires prompt approval
 
 ---
 
-## Known issues to watch
-- See `docs/devlog.md` entry "2026-03-16 — Code review + bug fixes" for full list
-- GUID fallback (sha256 of title) still theoretically allows collision for identical paper titles — monitor if duplicates appear
-- Keyword evaluator terms are hardcoded — cannot be customized without editing `keyword.py`
+## Known issues / pitfalls
+
+- **Prompt/profile are frozen** — any changes to `relevance_json.py` (prompt) or `profile.md` require explicit user approval before editing.
+- **763 haiku papers in DB** — triage distribution differs from sonnet. Mixed DB until re-evaluated or aged out.
+- **Interactive logon only** — scheduled task won't fire if screen is locked. Fix: Task Scheduler → PaperBreakfast → "Run whether user is logged on or not".
+- **PubMed RSS lags ~24h** — Blood, Blood Advances, Cancer Discovery, CCR, JAMA Oncology via PubMed mirrors.
+- **`included_in_digest` is permanent** — re-sending requires direct DB unmark.
+- **pi_name format inconsistent** — "Last F" vs "Last First" depending on source. Not normalised.
+- See `docs/devlog.md` 2026-03-21 entry for full context.

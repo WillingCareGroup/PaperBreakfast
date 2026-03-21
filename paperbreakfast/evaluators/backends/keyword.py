@@ -18,27 +18,31 @@ POSITIVE_TERMS = [
     # HSC / HSPC
     r"\bHSC\b", r"\bHSPC\b", r"hematopoietic stem", r"hematopoietic progenitor",
     r"stem cell expansion", r"ex vivo expansion", r"cord blood",
-    r"stem cell mobiliz", r"engraftment", r"self-renewal",
+    r"stem cell mobiliz", r"engraftment", r"\bself-renewal\b",
     # Cell therapy
-    r"\bCAR.T\b", r"chimeric antigen receptor", r"\bCAR.NK\b",
+    r"\bCAR[-\s]T\b", r"chimeric antigen receptor", r"\bCAR[-\s]NK\b",
     r"cell therapy", r"cellular therapy", r"adoptive cell",
     r"allogeneic", r"off.the.shelf", r"\biPSC\b", r"induced pluripotent",
     # Manufacturing / engineering
-    r"gene editing", r"\bCRISPR\b", r"base editing", r"prime editing",
+    r"\bgene editing\b", r"\bCRISPR\b", r"base editing", r"prime editing",
     r"lentiviral", r"retroviral", r"\bAAV\b", r"viral vector", r"gene therapy",
-    r"gene correction", r"GMP", r"manufacturing",
+    r"gene correction", r"\bGMP\b", r"manufacturing",
     # Clinical / disease
     r"\bHSCT\b", r"bone marrow transplant", r"sickle cell", r"thalassemia",
     r"\bAML\b", r"\bALL\b", r"\bMDS\b", r"leukemia", r"lymphoma",
     # AI / protein design
-    r"protein design", r"de novo protein", r"AlphaFold", r"RFdiffusion",
-    r"ProteinMPNN", r"ESMFold", r"foundation model",
+    r"protein design", r"de novo protein", r"\bAlphaFold\b", r"\bRFdiffusion\b",
+    r"\bProteinMPNN\b", r"\bESMFold\b", r"foundation model",
 ]
 
 NEGATIVE_TERMS = [
     r"epidemiology", r"observational study", r"population.based",
     r"cardiovascular(?!.*stem)", r"cardiac(?!.*stem)",
 ]
+
+# Score thresholds for triage mapping
+_READ_THRESHOLD = 0.8
+_SKIM_THRESHOLD = 0.6
 
 
 class KeywordEvaluator(Evaluator):
@@ -67,14 +71,26 @@ class KeywordEvaluator(Evaluator):
         raw_score -= len(set(negative_hits)) * 0.2
         score = max(0.0, min(1.0, raw_score))
 
-        if positive_hits:
-            display = list(dict.fromkeys(positive_hits))[:5]  # deduplicated, ordered
-            reasoning = f"Matched {len(set(positive_hits))} relevant terms: {', '.join(display)}."
+        if score >= _READ_THRESHOLD:
+            triage = "read"
+        elif score >= _SKIM_THRESHOLD:
+            triage = "skim"
         else:
-            reasoning = "No relevant keywords matched."
+            triage = "skip"
+
+        summary = None
+        if triage != "skip" and positive_hits:
+            display = list(dict.fromkeys(positive_hits))[:5]
+            summary = {
+                "problem": "(keyword evaluation — no semantic analysis)",
+                "model": "N/A — not stated in abstract",
+                "finding": f"Matched {len(set(positive_hits))} relevant terms: {', '.join(display)}.",
+                "impact": "(keyword evaluation — verify with LLM evaluator)",
+            }
 
         return EvaluationResult(
-            score=score,
-            reasoning=reasoning,
+            triage=triage,
+            milestone=False,
+            summary=summary,
             evaluator_name=self.name,
         )

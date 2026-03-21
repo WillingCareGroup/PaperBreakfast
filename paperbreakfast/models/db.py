@@ -42,15 +42,28 @@ class Paper(BaseModel):
     published_date = DateTimeField(null=True)
     fetched_at = DateTimeField(default=datetime.utcnow)
 
-    # Evaluation
-    score = FloatField(null=True)         # 0.0–1.0, null = not yet evaluated
-    reasoning = TextField(null=True)
+    # Evaluation — triage-based (replaces legacy score/reasoning)
+    triage = CharField(max_length=16, null=True)   # "read" | "skim" | "horizon" | "skip" | null = not evaluated
+    milestone = BooleanField(null=True)             # True = paradigm-shifting advance
+    summary = TextField(null=True)                  # JSON: {problem, model, finding, impact}
     evaluator_name = CharField(max_length=128, null=True)
+    evaluator_model = CharField(max_length=128, null=True)  # e.g. "claude-sonnet-4-6"
     evaluated_at = DateTimeField(null=True)
+
+    # Legacy columns — kept for backward compat with pre-v2 data, not written by new code
+    score = FloatField(null=True)
+    reasoning = TextField(null=True)
 
     # Digest tracking
     included_in_digest = BooleanField(default=False)
     digest_sent_at = DateTimeField(null=True)
+
+    # DOI — populated during fetch from dc_identifier; used for API enrichment
+    doi = CharField(max_length=256, null=True)
+
+    # Extracted by LLM during evaluation — null if not recognised
+    institution = CharField(max_length=256, null=True)
+    pi_name = CharField(max_length=256, null=True)
 
     # User relevance feedback — populated via `python main.py feedback`
     # Values: "good" (relevant, correctly surfaced) | "noise" (irrelevant, false positive)
@@ -82,21 +95,40 @@ def init_db(db_path: str):
     database_proxy.initialize(db)
     db.connect(reuse_if_open=True)
     db.create_tables([Paper, DigestRun], safe=True)
+    # Lightweight migrations — add columns introduced after initial schema.
+    # SQLite ignores "duplicate column" errors so we catch and continue.
+    migrations = [
+        "ALTER TABLE papers ADD COLUMN doi VARCHAR(256)",
+        "ALTER TABLE papers ADD COLUMN triage VARCHAR(16)",
+        "ALTER TABLE papers ADD COLUMN milestone BOOLEAN",
+        "ALTER TABLE papers ADD COLUMN summary TEXT",
+        "ALTER TABLE papers ADD COLUMN evaluator_model VARCHAR(128)",
+    ]
+    for stmt in migrations:
+        try:
+            db.execute_sql(stmt)
+        except Exception:
+            pass  # column already exists
     logger.info(f"Database ready: {db_path}")
     return db
 
 
 def get_unevaluated_papers() -> list:
-    return list(Paper.select().where(Paper.score.is_null()))
+    return list(Paper.select().where(Paper.triage.is_null()))
 
 
-def get_papers_for_digest(since: datetime, score_threshold: float) -> list:
+def get_papers_for_digest(since: datetime) -> list:
     return list(
         Paper.select()
         .where(
-            (Paper.score >= score_threshold)
+            (Paper.triage.in_(["read", "skim", "horizon"]))
             & (Paper.included_in_digest == False)  # noqa: E712
             & (Paper.fetched_at >= since)
         )
-        .order_by(Paper.score.desc())
     )
+
+
+def get_papers_fetched_today() -> int:
+    from datetime import date, time
+    start = datetime.combine(date.today(), time.min)
+    return Paper.select().where(Paper.fetched_at >= start).count()

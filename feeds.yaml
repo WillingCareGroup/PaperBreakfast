@@ -6,10 +6,14 @@
 #   group   — Logical grouping (for future filtering)
 #   enabled — Set to false to temporarily skip a feed without deleting it
 #
-# How to find RSS URLs:
-#   Cell Press:  https://www.cell.com/{journal}/inpress.rss  (ahead of print, most timely)
-#   Nature:      https://www.nature.com/{abbreviation}.rss
-#   Science.org: https://www.science.org/rss/{journal}.xml
+# URL patterns by publisher:
+#   Cell Press:      https://www.cell.com/{journal-slug}/inpress.rss
+#   Nature:          https://www.nature.com/{abbreviation}.rss
+#   Science.org:     https://www.science.org/action/showFeed?type=etoc&feed=rss&jc={code}
+#   Lancet/Elsevier: https://www.thelancet.com/rssfeed/{code}_current.xml
+#   Wiley:           https://onlinelibrary.wiley.com/feed/{issn-no-hyphen}/most-recent
+#   AACR/Silverchair: https://aacrjournals.org/{journal}/rss/current.xml
+#   ASH/Silverchair: https://ashpublications.org/{journal}/rss/current.xml
 
 feeds:
 
@@ -44,6 +48,34 @@ feeds:
     group: cell-press
     enabled: true
 
+  - url: https://www.cell.com/cell-reports/inpress.rss
+    name: Cell Reports
+    group: cell-press
+    enabled: true
+
+  - url: https://www.cell.com/molecular-therapy/inpress.rss
+    name: Molecular Therapy
+    group: cell-press
+    enabled: true
+
+  # Mol Therapy sub-journals not on cell.com inpress — use ScienceDirect ISSN feeds
+  # Molecular Therapy - Nucleic Acids ISSN 2162-2531
+  - url: https://rss.sciencedirect.com/publication/science/21622531
+    name: Molecular Therapy - Nucleic Acids
+    group: cell-press
+    enabled: true
+
+  # Molecular Therapy - Methods & Clinical Development ISSN 2329-0501
+  - url: https://rss.sciencedirect.com/publication/science/23290501
+    name: Molecular Therapy - Methods & Clinical Development
+    group: cell-press
+    enabled: true
+
+  - url: https://www.cell.com/stem-cell-reports/inpress.rss
+    name: Stem Cell Reports
+    group: cell-press
+    enabled: true
+
   # ── Nature family ────────────────────────────────────────────────────────────
   - url: https://www.nature.com/nature.rss
     name: Nature
@@ -75,18 +107,175 @@ feeds:
     group: nature
     enabled: true
 
+  - url: https://www.nature.com/natcancer.rss
+    name: Nature Cancer
+    group: nature
+    enabled: true
+
+  - url: https://www.nature.com/ni.rss
+    name: Nature Immunology
+    group: nature
+    enabled: true
+
+  - url: https://www.nature.com/ng.rss
+    name: Nature Genetics
+    group: nature
+    enabled: true
+
+  - url: https://www.nature.com/leu.rss
+    name: Leukemia
+    group: nature
+    enabled: true
+
+  - url: https://feeds.nature.com/bcj/rss/current
+    name: Blood Cancer Journal
+    group: nature
+    enabled: true
+
+  - url: https://www.nature.com/gt.rss
+    name: Gene Therapy
+    group: nature
+    enabled: true
+
+  - url: https://feeds.nature.com/bmt/rss/current
+    name: Bone Marrow Transplantation
+    group: nature
+    enabled: true
+
+  - url: https://feeds.nature.com/npjregenmed/rss/current
+    name: npj Regenerative Medicine
+    group: nature
+    enabled: true
+
+  - url: https://www.nature.com/nsmb.rss
+    name: Nature Structural & Molecular Biology
+    group: nature
+    enabled: true
+
   # ── Science family ───────────────────────────────────────────────────────────
   - url: https://www.science.org/action/showFeed?type=etoc&feed=rss&jc=science
     name: Science
     group: science
     enabled: true
 
-  - url: https://www.science.org/rss/stm.xml
+  - url: https://www.science.org/action/showFeed?type=etoc&feed=rss&jc=stm
     name: Science Translational Medicine
     group: science
     enabled: true
 
-  - url: https://www.science.org/rss/advances.xml
+  - url: https://www.science.org/action/showFeed?type=etoc&feed=rss&jc=sciadv
     name: Science Advances
     group: science
+    enabled: true
+
+  # ── ASH Publications — ashpublications.org 403s directly; use PubMed mirror ─
+  - url: https://pubmed.ncbi.nlm.nih.gov/rss/journals/blood/?limit=20&utm_campaign=journals
+    name: Blood
+    group: hematology
+    enabled: true
+
+  - url: https://pubmed.ncbi.nlm.nih.gov/rss/journals/bloodadv/?limit=20&utm_campaign=journals
+    name: Blood Advances
+    group: hematology
+    enabled: true
+
+  # ── AACR — aacrjournals.org blocks direct RSS; use PubMed mirror ────────────
+  - url: https://pubmed.ncbi.nlm.nih.gov/rss/journals/cancerdiscovery/?limit=20&utm_campaign=journals
+    name: Cancer Discovery
+    group: oncology
+    enabled: true
+
+  - url: https://pubmed.ncbi.nlm.nih.gov/rss/journals/clincancerres/?limit=20&utm_campaign=journals
+    name: Clinical Cancer Research
+    group: oncology
+    enabled: true
+
+  # ── Lancet / Elsevier ────────────────────────────────────────────────────────
+  - url: https://www.thelancet.com/rssfeed/lancet_current.xml
+    name: The Lancet
+    group: clinical
+    enabled: true
+
+  - url: https://www.thelancet.com/rssfeed/lanonc_current.xml
+    name: Lancet Oncology
+    group: clinical
+    enabled: true
+
+  - url: https://www.thelancet.com/rssfeed/lanhae_current.xml
+    name: Lancet Haematology
+    group: clinical
+    enabled: true
+
+  # ── NEJM ─────────────────────────────────────────────────────────────────────
+  - url: https://www.nejm.org/action/showFeed?jc=nejm&type=etoc&feed=rss
+    name: New England Journal of Medicine
+    group: clinical
+    enabled: true
+
+  # ── JCI ──────────────────────────────────────────────────────────────────────
+  - url: https://www.jci.org/rss/current
+    name: Journal of Clinical Investigation
+    group: clinical
+    enabled: true
+
+  - url: https://insight.jci.org/rss/current
+    name: JCI Insight
+    group: clinical
+    enabled: true
+
+  # ── JAMA Network — jamanetwork.com 403s directly; use PubMed mirror ─────────
+  - url: https://pubmed.ncbi.nlm.nih.gov/rss/journals/jamaoncol/?limit=20&utm_campaign=journals
+    name: JAMA Oncology
+    group: clinical
+    enabled: true
+
+  # ── Annals of Oncology ───────────────────────────────────────────────────────
+  # Annals of Oncology ISSN 0923-7534 — ScienceDirect feed
+  - url: https://rss.sciencedirect.com/publication/science/09237534
+    name: Annals of Oncology
+    group: clinical
+    enabled: true
+
+  # ── Wiley journals ───────────────────────────────────────────────────────────
+  # American Journal of Hematology — ISSN 1096-9837
+  - url: https://onlinelibrary.wiley.com/feed/10969837/most-recent
+    name: American Journal of Hematology
+    group: hematology
+    enabled: true
+
+  # British Journal of Haematology — ISSN 1365-2141
+  - url: https://onlinelibrary.wiley.com/feed/13652141/most-recent
+    name: British Journal of Haematology
+    group: hematology
+    enabled: true
+
+  # ── BioMed Central — direct RSS 404s; use Springer search RSS ────────────────
+  # JHO Springer journal ID: 13045
+  - url: https://link.springer.com/search.rss?search-within=Journal&facet-journal-id=13045
+    name: Journal of Hematology & Oncology
+    group: hematology
+    enabled: true
+
+  # ── Mary Ann Liebert ─────────────────────────────────────────────────────────
+  - url: https://www.liebertpub.com/action/showFeed?jc=hum&type=etoc&feed=rss
+    name: Human Gene Therapy
+    group: cell-gene-therapy
+    enabled: true
+
+  # ── Taylor & Francis ─────────────────────────────────────────────────────────
+  - url: https://www.tandfonline.com/feed/rss/icyt20
+    name: Cytotherapy
+    group: cell-gene-therapy
+    enabled: true
+
+  # ── PNAS ─────────────────────────────────────────────────────────────────────
+  - url: https://www.pnas.org/action/showFeed?jc=pnas&type=etoc&feed=rss
+    name: PNAS
+    group: broad
+    enabled: true
+
+  # ── eLife ────────────────────────────────────────────────────────────────────
+  - url: https://elifesciences.org/rss/recent.xml
+    name: eLife
+    group: broad
     enabled: true
