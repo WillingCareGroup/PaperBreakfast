@@ -6,7 +6,7 @@ A self-hosted daily literature digest for researchers. PaperBreakfast polls RSS 
 
 ## Why
 
-Keeping up with 40+ journals is a daily time tax. PaperBreakfast replaces that with a single email containing only the papers that cleared the bar — ranked, summarized, and explained.
+Keeping up with 48 journals is a daily time tax. PaperBreakfast replaces that with a single email containing only the papers that cleared the bar — ranked, summarized, and explained.
 
 Each paper is evaluated against a richly described interest profile you write once. The LLM classifies every abstract into one of four triage labels and writes a structured four-field summary (Problem / Model / Finding / Impact). The daily email groups papers into three sections — **Read**, **On the Horizon**, and **Skim** — so you know immediately where to spend your attention.
 
@@ -17,7 +17,7 @@ The system runs entirely on your own machine. No subscription, no hosted service
 ## How it works
 
 ```
-RSS feeds — polled every 2 hours via feedparser
+RSS feeds — polled once daily via feedparser
     ↓
 SQLite — deduplicated by GUID, enriched with DOI / PI / institution via Crossref + PubMed
     ↓
@@ -154,9 +154,9 @@ evaluator:
 python main.py run
 ```
 
-Polls feeds every 2 hours and sends the daily digest at the `send_hour` configured in `config.yaml`.
+Runs the full pipeline (fetch + evaluate + enrich + digest) once daily at the `send_hour` configured in `config.yaml` (UTC).
 
-**Windows Task Scheduler** — for unattended daily runs on Windows, create a scheduled task pointing at `run_digest.bat`. In the task properties, set it to run **whether or not the user is logged on** — otherwise the task will silently skip when your session is locked.
+**Windows Task Scheduler** — for unattended daily runs on Windows, create a scheduled task pointing at `run_digest.bat`. This runs `python main.py run-once` (full pipeline: fetch + evaluate + enrich + digest) and logs output to `logs/scheduler.log`. In the task properties, set it to run **whether or not the user is logged on** — otherwise the task will silently skip when your session is locked.
 
 ---
 
@@ -220,6 +220,7 @@ The `horizon` label is particularly sensitive to the Baseline Knowledge section.
 | Command | Description |
 |---|---|
 | `python main.py run` | Start the scheduler daemon |
+| `python main.py run-once` | Run full pipeline once (fetch + evaluate + enrich + digest) |
 | `python main.py fetch` | Run one poll + evaluate cycle immediately |
 | `python main.py digest` | Send digest immediately |
 | `python main.py status` | Show database statistics |
@@ -289,20 +290,21 @@ Results on the 15-paper hand-labeled ground truth set, covering the full relevan
 |---|---|---|---|---|
 | Keyword (baseline) | 100% | 22% | 36% | No LLM; conservative by design |
 | Claude 3 Haiku | 75.0% | 100% | 85.7% | Systematic overscoring bias |
-| Claude Haiku 4.5 | 81.8% | 100% | 90.0% | Selected model at launch |
+| Claude Haiku 4.5 | 81.8% | 100% | 90.0% | Initial production model |
+| Claude Sonnet 4.6 | — | — | — | Current model; not yet benchmarked on this set |
 
-Claude 3 Haiku scored nearly everything 0.80–0.90 regardless of true relevance and produced generic reasoning. Haiku 4.5 eliminated that bias with no recall loss. At the ~$0.30/month cost difference, the quality improvement was clear.
+Claude 3 Haiku scored nearly everything 0.80–0.90 regardless of true relevance and produced generic reasoning. Haiku 4.5 eliminated that bias with no recall loss. The system was subsequently upgraded to Sonnet 4.6 for improved triage judgment and structured summary quality.
 
 ### Evaluation efficiency
 
-Chunked evaluation (10 papers per LLM call) reduced API overhead by ~96% compared to per-paper calls:
+Chunked evaluation (25 papers per LLM call, the default) reduced API overhead by ~96% compared to per-paper calls:
 
 | Mode | Calls for 833 papers | Relative cost |
 |---|---|---|
 | Per-paper | 833 | 1× |
-| Chunked (chunk_size=10) | 34 | ~0.04× |
+| Chunked (chunk_size=25) | 34 | ~0.04× |
 
-The default `chunk_size: 10` in `config.yaml` balances throughput and parse reliability. Larger chunks reduce cost further but increase the chance of a single malformed response affecting multiple papers.
+`chunk_size` is configurable in `config.yaml`. Smaller values (e.g. 10) improve parse reliability at slightly higher cost; larger values reduce cost further but increase the blast radius of a single malformed response.
 
 ### Enrichment coverage
 
