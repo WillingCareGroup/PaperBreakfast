@@ -51,6 +51,11 @@ class ClaudeBackend(LLMBackend):
                     }],
                     messages=[{"role": "user", "content": user_prompt}],
                 )
+                if not message.content:
+                    logger.warning(
+                        f"Claude returned empty content (stop_reason={message.stop_reason})"
+                    )
+                    return ""
                 return message.content[0].text
 
             except anthropic.AuthenticationError as e:

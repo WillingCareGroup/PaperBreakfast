@@ -29,11 +29,15 @@ class Mailer:
         date_str = datetime.utcnow().strftime("%b %d")
         subject = f"PaperBreakfast — {payload.paper_count} papers — {date_str}"
 
-        msg = MIMEMultipart("alternative")
+        msg = MIMEMultipart("mixed")
         msg["Subject"] = subject
         msg["From"] = cfg.from_addr
         msg["To"] = ", ".join(cfg.to_addrs)
         msg.attach(MIMEText(payload.html, "html", "utf-8"))
+
+        attachment = MIMEText(payload.html, "html", "utf-8")
+        attachment.add_header("Content-Disposition", "attachment", filename="digest.html")
+        msg.attach(attachment)
 
         smtp = None
         try:

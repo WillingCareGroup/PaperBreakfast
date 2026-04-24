@@ -214,7 +214,7 @@ For local servers (LM Studio, Ollama), rapid calls can cause queue buildup.
 
 **Type:** Decision
 **Context:** First live email send.
-**Decision:** Gmail SMTP (smtp.gmail.com:587 STARTTLS) with App Password stored in `.env`. Sender: James.report.ai@gmail.com, receiver: zhengpri@gmail.com.
+**Decision:** Gmail SMTP (smtp.gmail.com:587 STARTTLS) with App Password stored in `.env`. Sender: `youraddress@gmail.com`, receiver: `recipient@example.com`.
 **Why:** Gmail App Passwords are the only supported SMTP auth method when 2FA is enabled on a Google account. Regular account password is rejected.
 **Pitfalls to watch:** App Passwords are silently revoked if 2FA is disabled or the Google account security settings change. If SMTP auth starts failing, regenerate the App Password.
 
@@ -308,3 +308,12 @@ For local servers (LM Studio, Ollama), rapid calls can cause queue buildup.
 **Context:** Full project review after v6 integration revealed legacy code paths still referencing removed `score`/`reasoning` fields on `EvaluationResult`.
 **Detail:** Fixed five crash bugs: `keyword.py` and `chain_of_thought.py` were returning `EvaluationResult(score=..., reasoning=...)` (fields removed in v2); `cli.py` `cmd_status`/`cmd_feedback` queried `Paper.score` (never written); `eval.py` accessed `outcome.score` and computed MAE (metric removed). Deleted `prompt research/` directory (content fully integrated). Updated README: removed MAE references, corrected model to `claude-sonnet-4-6`, updated output format description, fixed score_threshold description, fixed feedback command syntax. [VERIFIED: all imports and functional tests pass]
 **Impact:** keyword and chain_of_thought backends were silently broken since v2 migration — now restored. CLI status/feedback and eval benchmark are now correct.
+
+---
+
+### 2026-04-16 — Fix: ClaudeBackend empty content crash (stop_reason=refusal)
+
+**Type:** Fix / Discovery
+**Context:** Three papers consistently failed with `list index out of range` across every evaluation run; two were stuck at `triage=None` indefinitely.
+**Detail:** Root cause: `message.content[0].text` in `claude.py` raises IndexError when the API returns an empty content list. Fixed by guarding with `if not message.content: return ""` and logging `stop_reason`. [VERIFIED: stop_reason=refusal] — Claude's safety system refuses papers containing insecticidal toxin (Vip1-Vip2 / Bacillus thuringiensis) and H5N1 content outright. Returning `""` routes through `parse_response` → `triage=skip, parse_error=True`, which saves the papers and clears them from the unevaluated queue permanently.
+**Impact:** Unevaluated queue now 0. `parse_error=True` is not persisted to DB so refused papers are indistinguishable from normal skips — the `stop_reason=refusal` WARNING log is the only signal. Watch logs if unexpected papers go missing from future digests.

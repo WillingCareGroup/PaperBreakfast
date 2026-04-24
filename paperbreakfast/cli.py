@@ -86,6 +86,29 @@ def cmd_digest(args, config):
         console.print(f"  [red]Send failed[/] — check logs. Papers: {result.paper_count}")
 
 
+def cmd_run_once(args, config):
+    from paperbreakfast.pipeline import Pipeline
+    console.print("[bold]Running full pipeline (fetch + evaluate + enrich + digest)...[/]")
+    p = Pipeline(config)
+    poll, ev, digest = p.run_full()
+    console.print(
+        f"  Poll: [green]{poll.feeds_ok}/{poll.feeds_total}[/] feeds OK — "
+        f"[green]{poll.total_new}[/] new papers"
+    )
+    for err in poll.errors:
+        console.print(f"  [red]Feed error:[/] {err}")
+    console.print(
+        f"  Eval: [green]{ev.evaluated}[/] papers"
+        + (f", [red]{ev.errors} errors[/]" if ev.errors else "")
+    )
+    if digest.sent:
+        console.print(f"  Digest: [green]Sent[/] — {digest.paper_count} papers")
+    elif digest.paper_count == 0:
+        console.print("  Digest: [yellow]Nothing to send[/]")
+    else:
+        console.print(f"  Digest: [red]Send failed[/] — {digest.paper_count} papers")
+
+
 def cmd_status(args, config):
     from paperbreakfast.models.db import DigestRun, Paper
 
@@ -229,6 +252,7 @@ def main():
     sub.add_parser("run", help="Start the scheduler daemon")
     sub.add_parser("fetch", help="Run one fetch + evaluate cycle now")
     sub.add_parser("digest", help="Send digest now")
+    sub.add_parser("run-once", help="Run full pipeline once (fetch + evaluate + enrich + digest)")
     sub.add_parser("status", help="Show database statistics")
     sub.add_parser("feeds", help="List configured feeds")
 
@@ -271,6 +295,7 @@ def main():
         "run": cmd_run,
         "fetch": cmd_fetch,
         "digest": cmd_digest,
+        "run-once": cmd_run_once,
         "status": cmd_status,
         "feeds": cmd_feeds,
         "eval": cmd_eval,
