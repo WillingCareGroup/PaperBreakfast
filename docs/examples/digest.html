@@ -1,0 +1,1728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PaperBreakfast &mdash; March 27, 2026</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: #f2f4f8;
+      color: #1a1a2e;
+      padding: 24px 16px;
+      line-height: 1.5;
+    }
+    .container { max-width: 680px; margin: 0 auto; }
+
+    /* ── Header ── */
+    .header {
+      background: #1a1a2e;
+      color: white;
+      border-radius: 10px;
+      padding: 28px 32px;
+      margin-bottom: 24px;
+    }
+    .header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+    .header-date {
+      font-size: 12px; font-weight: 600;
+      color: rgba(255,255,255,0.5);
+      white-space: nowrap;
+    }
+    /* Triage counts — primary stats, right side of banner */
+    .triage-stats { text-align: right; }
+    .triage-stat { display: inline-block; margin-left: 28px; }
+    .triage-stat .big-num {
+      font-size: 36px; font-weight: 700; line-height: 1;
+    }
+    .triage-stat .big-label {
+      font-size: 9px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.4px;
+      color: rgba(255,255,255,0.45); margin-top: 3px;
+    }
+    .num-read    { color: #27ae60; }
+    .num-horizon { color: #9b7fe8; }
+    .num-skim    { color: #f39c12; }
+    /* Status corner — small secondary stats, bottom-left */
+    .status-corner { margin-top: 20px; }
+    .status-item {
+      display: inline-block; margin-right: 20px;
+      font-size: 11px; color: rgba(255,255,255,0.45);
+    }
+    .status-item strong {
+      font-weight: 700; color: rgba(255,255,255,0.75);
+    }
+    .status-item.feeds-ok strong   { color: #27ae60; }
+    .status-item.feeds-warn strong { color: #e94560; }
+
+    /* ── Section dividers ── */
+    .section-divider {
+      padding: 20px 2px 6px 2px;
+      margin-bottom: 4px;
+    }
+    .section-label {
+      font-size: 9px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 2px;
+      color: #bbb;
+    }
+
+    /* ── Paper cards ── */
+    .paper-card {
+      background: white;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+      border-left: 4px solid #ccc;
+    }
+    .paper-card.tier-read    { border-left-color: #27ae60; }
+    .paper-card.tier-horizon { border-left-color: #7e57c2; }
+    .paper-card.tier-skim    { border-left-color: #f39c12; }
+
+    /* Journal label + triage badge row */
+    .card-top { margin-bottom: 7px; }
+    .journal-label {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.2px;
+      color: #aaa;
+    }
+    .triage-badge {
+      font-size: 11px; font-weight: 700;
+      padding: 2px 9px; border-radius: 20px;
+      text-transform: uppercase; letter-spacing: 0.8px;
+      white-space: nowrap; display: inline-block;
+    }
+    .triage-badge.tier-read    { background: #eafaf1; color: #27ae60; }
+    .triage-badge.tier-horizon { background: #ede7f6; color: #4527a0; }
+    .triage-badge.tier-skim    { background: #fef9e7; color: #d68910; }
+    .milestone-badge {
+      font-size: 11px; font-weight: 700;
+      padding: 2px 9px; border-radius: 20px;
+      background: #fdf2d0; color: #9a6f00;
+      white-space: nowrap; display: inline-block;
+      margin-left: 4px;
+    }
+
+    /* Title */
+    .paper-title {
+      font-size: 15px; font-weight: 600;
+      line-height: 1.4; margin-bottom: 7px;
+    }
+    .paper-title a { color: #1a1a2e; text-decoration: none; }
+    .paper-title a:hover { color: #e94560; text-decoration: underline; }
+
+    /* Tags */
+    .tags { margin-bottom: 7px; }
+    .tag {
+      font-size: 10px; font-weight: 600;
+      padding: 2px 8px; border-radius: 12px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      display: inline-block; margin-right: 4px; margin-bottom: 3px;
+    }
+
+    /* Author + institution meta */
+    .meta-line {
+      font-size: 11px; color: #999;
+      margin-bottom: 7px;
+    }
+    .meta-author { font-weight: 600; color: #555; }
+    .meta-sep { margin: 0 5px; color: #ddd; }
+
+    /* Summary block */
+    .summary-block {
+      border-top: 1px solid #f0f2f7;
+      padding-top: 10px; margin-top: 6px;
+    }
+    .summary-row {
+      display: flex;
+      font-size: 12.5px;
+      margin-bottom: 5px;
+      line-height: 1.45;
+    }
+    .summary-label {
+      font-size: 9px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; color: #bbb;
+      min-width: 58px; padding-top: 2px; flex-shrink: 0;
+    }
+    .summary-label.transfer { color: #9c7fc7; }
+    .summary-text { color: #555; }
+
+    /* Read link */
+    .read-link {
+      display: inline-block;
+      font-size: 11.5px; font-weight: 600;
+      color: #e94560; text-decoration: none;
+      margin-top: 10px;
+    }
+    .read-link:hover { text-decoration: underline; }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center; font-size: 11px;
+      color: #bbb; padding: 24px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="header">
+      <!-- Triage counts left, title + date right -->
+      <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+        <tr>
+          <td style="vertical-align:middle;">
+            <div class="triage-stats" style="text-align:left;">
+              <div class="triage-stat" style="margin-left:0; margin-right:28px;">
+                <div class="big-num num-read">1</div>
+                <div class="big-label">Read</div>
+              </div>
+              <div class="triage-stat" style="margin-left:0; margin-right:28px;">
+                <div class="big-num num-horizon">6</div>
+                <div class="big-label">Horizon</div>
+              </div>
+              <div class="triage-stat" style="margin-left:0;">
+                <div class="big-num num-skim">11</div>
+                <div class="big-label">Skim</div>
+              </div>
+            </div>
+          </td>
+          <td style="vertical-align:top; text-align:right; white-space:nowrap; padding-left:16px;">
+            <h1>PaperBreakfast</h1>
+            <div class="header-date" style="margin-top:4px;">March 27, 2026</div>
+          </td>
+        </tr>
+      </table>
+      <!-- Status corner: secondary stats -->
+      <div class="status-corner">
+        <span class="status-item">
+          <strong>18/138</strong> recommended
+        </span>
+        
+        <span class="status-item feeds-ok">
+          <strong>48/48</strong> feeds
+        </span>
+        
+      </div>
+    </div>
+
+    
+    
+
+    
+    
+    <div class="section-divider"><span class="section-label">Read</span></div>
+    
+      
+      
+
+      
+      
+        
+      
+
+      <div class="paper-card tier-read">
+
+        <!-- Journal label + triage badge — table for reliable alignment -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin-bottom:7px;">
+          <tr>
+            <td style="vertical-align:middle;">
+              <span class="journal-label">Science</span>
+            </td>
+            <td style="white-space:nowrap; padding-left:12px; vertical-align:middle; text-align:right;">
+              <span class="triage-badge tier-read">read</span>
+              
+            </td>
+          </tr>
+        </table>
+
+        <!-- Title -->
+        <div class="paper-title">
+          <a href="https://www-science-org.libproxy2.usc.edu/doi/abs/10.1126/science.adz6830?af=R" target="_blank" rel="noopener">Distinctive DNA sequence features define epigenetic longevity of inflammatory memory</a>
+        </div>
+
+        <!-- Tags -->
+        
+
+        <!-- PI · Institution · Published date -->
+        <div class="meta-line">
+          <span class="meta-author">Fuchs E</span>
+          <span class="meta-sep">&middot;</span>
+          
+            Robin Chemers Neustein Laboratory of Mammalian Cell Biology and Development, Howard Hughes Medical Institute, The Rockefeller University, New York, NY, USA.
+          
+          
+            <span class="meta-sep">&middot;</span>Mar 26, 2026
+          
+        </div>
+
+        <!-- Structured summary -->
+        
+        <div class="summary-block">
+          
+          <div class="summary-row">
+            <span class="summary-label">Problem</span>
+            <span class="summary-text">What DNA sequence features define the epigenetic longevity of inflammatory memory.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Model</span>
+            <span class="summary-text">N/A — not stated in abstract</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Finding</span>
+            <span class="summary-text">(abstract insufficient — finding not determinable)</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label" >Impact</span>
+            <span class="summary-text">Identifying sequence-level determinants of durable inflammatory epigenetic memory has direct implications for understanding trained immunity, progenitor cell epigenetic programming, and the design of cell therapies where persistent or erasable epigenetic states are therapeutically relevant.</span>
+          </div>
+          
+          
+        </div>
+        
+
+        <a href="https://www-science-org.libproxy2.usc.edu/doi/abs/10.1126/science.adz6830?af=R" class="read-link" target="_blank" rel="noopener">Read paper &rarr;</a>
+
+      </div>
+    
+    
+    
+
+    
+    
+    <div class="section-divider"><span class="section-label">On the Horizon</span></div>
+    
+      
+      
+
+      
+      
+        
+      
+
+      <div class="paper-card tier-horizon">
+
+        <!-- Journal label + triage badge — table for reliable alignment -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin-bottom:7px;">
+          <tr>
+            <td style="vertical-align:middle;">
+              <span class="journal-label">Nature Biotechnology</span>
+            </td>
+            <td style="white-space:nowrap; padding-left:12px; vertical-align:middle; text-align:right;">
+              <span class="triage-badge tier-horizon">horizon</span>
+              
+            </td>
+          </tr>
+        </table>
+
+        <!-- Title -->
+        <div class="paper-title">
+          <a href="https://www-nature-com.libproxy2.usc.edu/articles/s41587-026-03044-0" target="_blank" rel="noopener">DNA–drug conjugates enable logic-gated drug delivery amplified by hybridization chain reactions</a>
+        </div>
+
+        <!-- Tags -->
+        
+
+        <!-- PI · Institution · Published date -->
+        <div class="meta-line">
+          <span class="meta-author">Winssinger N</span>
+          <span class="meta-sep">&middot;</span>
+          
+            <span style="color:#ccc;">&#127963; Institution unavailable</span>
+          
+          
+            <span class="meta-sep">&middot;</span>Mar 27, 2026
+          
+        </div>
+
+        <!-- Structured summary -->
+        
+        <div class="summary-block">
+          
+          <div class="summary-row">
+            <span class="summary-label">Problem</span>
+            <span class="summary-text">How to achieve logic-gated, amplified drug delivery into cells using programmable molecular systems.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Model</span>
+            <span class="summary-text">N/A — not stated in abstract</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Finding</span>
+            <span class="summary-text">DNA–drug conjugates enable logic-gated drug delivery that is amplified by hybridization chain reactions.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label" >Impact</span>
+            <span class="summary-text">Type B — The DNA–drug conjugate platform represents a programmable delivery framework; the logic-gating and amplification principles are concretely transferable to conditional payload delivery in engineered cell therapy contexts (e.g., conditionally active CAR constructs or targeted delivery to tumor cells).</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label transfer">Transfer</span>
+            <span class="summary-text">Type B — The hybridization chain reaction amplification and logic-gating framework is a molecular engineering approach directly transferable to designing conditionally activated therapeutic payloads in cell and gene therapy systems.</span>
+          </div>
+          
+        </div>
+        
+
+        <a href="https://www-nature-com.libproxy2.usc.edu/articles/s41587-026-03044-0" class="read-link" target="_blank" rel="noopener">Read paper &rarr;</a>
+
+      </div>
+    
+    
+      
+      
+
+      
+      
+        
+      
+
+      <div class="paper-card tier-horizon">
+
+        <!-- Journal label + triage badge — table for reliable alignment -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin-bottom:7px;">
+          <tr>
+            <td style="vertical-align:middle;">
+              <span class="journal-label">Science</span>
+            </td>
+            <td style="white-space:nowrap; padding-left:12px; vertical-align:middle; text-align:right;">
+              <span class="triage-badge tier-horizon">horizon</span>
+              
+            </td>
+          </tr>
+        </table>
+
+        <!-- Title -->
+        <div class="paper-title">
+          <a href="https://www-science-org.libproxy2.usc.edu/doi/abs/10.1126/science.adv0134?af=R" target="_blank" rel="noopener">Chromatin buffers torsional stress during transcription</a>
+        </div>
+
+        <!-- Tags -->
+        
+
+        <!-- PI · Institution · Published date -->
+        <div class="meta-line">
+          <span class="meta-author">Wang M</span>
+          <span class="meta-sep">&middot;</span>
+          
+            Department of Physics and LASSP, Cornell University, Ithaca, NY, USA.
+          
+          
+            <span class="meta-sep">&middot;</span>Mar 26, 2026
+          
+        </div>
+
+        <!-- Structured summary -->
+        
+        <div class="summary-block">
+          
+          <div class="summary-row">
+            <span class="summary-label">Problem</span>
+            <span class="summary-text">How chromatin manages torsional stress generated during transcription.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Model</span>
+            <span class="summary-text">N/A — not stated in abstract</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Finding</span>
+            <span class="summary-text">(abstract insufficient — finding not determinable)</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label" >Impact</span>
+            <span class="summary-text">Reveals a structural/mechanical buffering role for chromatin organization during active transcription, with implications for understanding how epigenetic state and gene regulation are coupled.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label transfer">Transfer</span>
+            <span class="summary-text">Type B — the chromatin mechanics framework described here is directly relevant to understanding how epigenetic identity is maintained in stem and progenitor cells during active transcription, a key question in HSPC self-renewal and commitment research.</span>
+          </div>
+          
+        </div>
+        
+
+        <a href="https://www-science-org.libproxy2.usc.edu/doi/abs/10.1126/science.adv0134?af=R" class="read-link" target="_blank" rel="noopener">Read paper &rarr;</a>
+
+      </div>
+    
+    
+      
+      
+
+      
+      
+        
+      
+
+      <div class="paper-card tier-horizon">
+
+        <!-- Journal label + triage badge — table for reliable alignment -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin-bottom:7px;">
+          <tr>
+            <td style="vertical-align:middle;">
+              <span class="journal-label">Science</span>
+            </td>
+            <td style="white-space:nowrap; padding-left:12px; vertical-align:middle; text-align:right;">
+              <span class="triage-badge tier-horizon">horizon</span>
+              
+                <span class="milestone-badge">&#9733; Milestone</span>
+              
+            </td>
+          </tr>
+        </table>
+
+        <!-- Title -->
+        <div class="paper-title">
+          <a href="https://www-science-org.libproxy2.usc.edu/doi/abs/10.1126/science.aec0018?af=R" target="_blank" rel="noopener">Experimental evidence of a liquid-liquid critical point in supercooled water</a>
+        </div>
+
+        <!-- Tags -->
+        
+        <div class="tags">
+          
+            
+              <span class="tag" style="background:#fdf2d0; color:#9a6f00;">Milestone</span>
+            
+          
+        </div>
+        
+
+        <!-- PI · Institution · Published date -->
+        <div class="meta-line">
+          <span class="meta-author">Nilsson A</span>
+          <span class="meta-sep">&middot;</span>
+          
+            Department of Physics, AlbaNova University Center, Stockholm University, Stockholm, Sweden.
+          
+          
+            <span class="meta-sep">&middot;</span>Mar 26, 2026
+          
+        </div>
+
+        <!-- Structured summary -->
+        
+        <div class="summary-block">
+          
+          <div class="summary-row">
+            <span class="summary-label">Problem</span>
+            <span class="summary-text">Whether a liquid-liquid critical point exists in supercooled water has been a long-standing unresolved question in physical chemistry.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Model</span>
+            <span class="summary-text">N/A — not stated in abstract</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Finding</span>
+            <span class="summary-text">Experimental evidence is reported for a liquid-liquid critical point in supercooled water.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label" >Impact</span>
+            <span class="summary-text">This confirms a decades-old theoretical prediction about water&#39;s phase behavior, representing a categorically new experimental result with broad implications for chemistry, biology, and materials science.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label transfer">Transfer</span>
+            <span class="summary-text">Type A — Physical chemistry domain; the existence of two distinct liquid phases of water is a genuinely surprising result that did not previously have experimental confirmation and has implications for understanding aqueous biological systems, protein folding, and cryopreservation.</span>
+          </div>
+          
+        </div>
+        
+
+        <a href="https://www-science-org.libproxy2.usc.edu/doi/abs/10.1126/science.aec0018?af=R" class="read-link" target="_blank" rel="noopener">Read paper &rarr;</a>
+
+      </div>
+    
+    
+      
+      
+
+      
+      
+        
+      
+
+      <div class="paper-card tier-horizon">
+
+        <!-- Journal label + triage badge — table for reliable alignment -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin-bottom:7px;">
+          <tr>
+            <td style="vertical-align:middle;">
+              <span class="journal-label">Science</span>
+            </td>
+            <td style="white-space:nowrap; padding-left:12px; vertical-align:middle; text-align:right;">
+              <span class="triage-badge tier-horizon">horizon</span>
+              
+            </td>
+          </tr>
+        </table>
+
+        <!-- Title -->
+        <div class="paper-title">
+          <a href="https://www-science-org.libproxy2.usc.edu/doi/abs/10.1126/science.aec1344?af=R" target="_blank" rel="noopener">High-dimensional topological photonic entanglement</a>
+        </div>
+
+        <!-- Tags -->
+        
+
+        <!-- PI · Institution · Published date -->
+        <div class="meta-line">
+          <span class="meta-author">Blanco-Redondo A</span>
+          <span class="meta-sep">&middot;</span>
+          
+            CREOL, The College of Optics and Photonics, University of Central Florida, Orlando, FL, USA.
+          
+          
+            <span class="meta-sep">&middot;</span>Mar 26, 2026
+          
+        </div>
+
+        <!-- Structured summary -->
+        
+        <div class="summary-block">
+          
+          <div class="summary-row">
+            <span class="summary-label">Problem</span>
+            <span class="summary-text">Generating and controlling high-dimensional entanglement in photonic systems remains a challenge for quantum information applications.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Model</span>
+            <span class="summary-text">N/A — not stated in abstract</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Finding</span>
+            <span class="summary-text">High-dimensional topological photonic entanglement is demonstrated.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label" >Impact</span>
+            <span class="summary-text">Type A — Quantum photonics domain; high-dimensional entanglement in a topologically protected photonic platform represents a capability expansion for quantum computing and communication that did not previously exist in this form.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label transfer">Transfer</span>
+            <span class="summary-text">Type A — Quantum information domain; topologically protected high-dimensional entanglement is a new category of quantum resource with broad implications for quantum computing and secure communication beyond the immediate photonics context.</span>
+          </div>
+          
+        </div>
+        
+
+        <a href="https://www-science-org.libproxy2.usc.edu/doi/abs/10.1126/science.aec1344?af=R" class="read-link" target="_blank" rel="noopener">Read paper &rarr;</a>
+
+      </div>
+    
+    
+      
+      
+
+      
+      
+        
+      
+
+      <div class="paper-card tier-horizon">
+
+        <!-- Journal label + triage badge — table for reliable alignment -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin-bottom:7px;">
+          <tr>
+            <td style="vertical-align:middle;">
+              <span class="journal-label">Science</span>
+            </td>
+            <td style="white-space:nowrap; padding-left:12px; vertical-align:middle; text-align:right;">
+              <span class="triage-badge tier-horizon">horizon</span>
+              
+            </td>
+          </tr>
+        </table>
+
+        <!-- Title -->
+        <div class="paper-title">
+          <a href="https://www-science-org.libproxy2.usc.edu/doi/abs/10.1126/science.aeh4836?af=R" target="_blank" rel="noopener">AI ‘agents’ go rogue in realistic simulations</a>
+        </div>
+
+        <!-- Tags -->
+        
+
+        <!-- PI · Institution · Published date -->
+        <div class="meta-line">
+          <span class="meta-author">Brainard J</span>
+          <span class="meta-sep">&middot;</span>
+          
+            <span style="color:#ccc;">&#127963; Institution unavailable</span>
+          
+          
+            <span class="meta-sep">&middot;</span>Mar 26, 2026
+          
+        </div>
+
+        <!-- Structured summary -->
+        
+        <div class="summary-block">
+          
+          <div class="summary-row">
+            <span class="summary-label">Problem</span>
+            <span class="summary-text">Whether AI agents behave safely and as intended when deployed in realistic simulated environments.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Model</span>
+            <span class="summary-text">N/A — not stated in abstract</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Finding</span>
+            <span class="summary-text">(abstract insufficient — finding not determinable)</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label" >Impact</span>
+            <span class="summary-text">AI agents exhibiting rogue behavior in realistic simulations has direct implications for the reliability of AI-assisted laboratory automation and self-driving lab platforms the researcher follows.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label transfer">Transfer</span>
+            <span class="summary-text">Type A — the finding that AI agents go rogue in realistic simulations challenges assumptions about AI system alignment and controllability, with implications for any domain deploying autonomous AI agents including self-driving labs and closed-loop experimental systems.</span>
+          </div>
+          
+        </div>
+        
+
+        <a href="https://www-science-org.libproxy2.usc.edu/doi/abs/10.1126/science.aeh4836?af=R" class="read-link" target="_blank" rel="noopener">Read paper &rarr;</a>
+
+      </div>
+    
+    
+      
+      
+
+      
+      
+        
+      
+
+      <div class="paper-card tier-horizon">
+
+        <!-- Journal label + triage badge — table for reliable alignment -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin-bottom:7px;">
+          <tr>
+            <td style="vertical-align:middle;">
+              <span class="journal-label">Science</span>
+            </td>
+            <td style="white-space:nowrap; padding-left:12px; vertical-align:middle; text-align:right;">
+              <span class="triage-badge tier-horizon">horizon</span>
+              
+            </td>
+          </tr>
+        </table>
+
+        <!-- Title -->
+        <div class="paper-title">
+          <a href="https://www-science-org.libproxy2.usc.edu/doi/abs/10.1126/science.aeh4838?af=R" target="_blank" rel="noopener">The Mpemba effect goes quantum</a>
+        </div>
+
+        <!-- Tags -->
+        
+
+        <!-- PI · Institution · Published date -->
+        <div class="meta-line">
+          <span class="meta-author">Savitsky Z</span>
+          <span class="meta-sep">&middot;</span>
+          
+            <span style="color:#ccc;">&#127963; Institution unavailable</span>
+          
+          
+            <span class="meta-sep">&middot;</span>Mar 26, 2026
+          
+        </div>
+
+        <!-- Structured summary -->
+        
+        <div class="summary-block">
+          
+          <div class="summary-row">
+            <span class="summary-label">Problem</span>
+            <span class="summary-text">Whether the Mpemba effect — the counterintuitive phenomenon where a hotter system cools faster than a cooler one — exists in quantum systems.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Model</span>
+            <span class="summary-text">N/A — not stated in abstract</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Finding</span>
+            <span class="summary-text">(abstract insufficient — finding not determinable)</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label" >Impact</span>
+            <span class="summary-text">Demonstrating a quantum Mpemba effect would represent a categorically new physical phenomenon with implications for quantum thermodynamics and non-equilibrium physics beyond classical systems.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label transfer">Transfer</span>
+            <span class="summary-text">Type A — extending the Mpemba effect into the quantum domain represents a genuinely new category of physical phenomenon that challenges classical thermodynamic intuitions and has cross-domain significance for quantum information and materials science.</span>
+          </div>
+          
+        </div>
+        
+
+        <a href="https://www-science-org.libproxy2.usc.edu/doi/abs/10.1126/science.aeh4838?af=R" class="read-link" target="_blank" rel="noopener">Read paper &rarr;</a>
+
+      </div>
+    
+    
+    
+
+    
+    
+    <div class="section-divider"><span class="section-label">Skim</span></div>
+    
+      
+      
+
+      
+      
+        
+      
+
+      <div class="paper-card tier-skim">
+
+        <!-- Journal label + triage badge — table for reliable alignment -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin-bottom:7px;">
+          <tr>
+            <td style="vertical-align:middle;">
+              <span class="journal-label">Cell</span>
+            </td>
+            <td style="white-space:nowrap; padding-left:12px; vertical-align:middle; text-align:right;">
+              <span class="triage-badge tier-skim">skim</span>
+              
+            </td>
+          </tr>
+        </table>
+
+        <!-- Title -->
+        <div class="paper-title">
+          <a href="https://www-cell-com.libproxy2.usc.edu/cell/fulltext/S0092-8674(26)00274-6?rss=yes" target="_blank" rel="noopener">Advancing precision health discovery in a genetically diverse health system</a>
+        </div>
+
+        <!-- Tags -->
+        
+
+        <!-- PI · Institution · Published date -->
+        <div class="meta-line">
+          <span class="meta-author">Geschwind D</span>
+          <span class="meta-sep">&middot;</span>
+          
+            <span style="color:#ccc;">&#127963; Institution unavailable</span>
+          
+          
+            <span class="meta-sep">&middot;</span>Mar 27, 2026
+          
+        </div>
+
+        <!-- Structured summary -->
+        
+        <div class="summary-block">
+          
+          <div class="summary-row">
+            <span class="summary-label">Problem</span>
+            <span class="summary-text">Clinical variant curation tools are biased toward European ancestry, limiting precision medicine applicability in genetically diverse populations.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Model</span>
+            <span class="summary-text">UCLA ATLAS biobank; multi-ancestry cohort spanning 5 continental and 36 fine-scale ancestries, integrated with EHR data</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Finding</span>
+            <span class="summary-text">Computational predictors mitigated European bias in variant curation, uncovering ancestry-specific disease-gene links; genetic factors influencing semaglutide-induced weight loss were also identified.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label" style="color:#d68910;">Focus</span>
+            <span class="summary-text">The methodology — using ancestrally diverse biobank-EHR integration with bias-correcting computational predictors — is worth noting for its approach to ancestry-specific pharmacogenomics, relevant if the researcher encounters similar bias issues in cell therapy or HSPC genomics contexts.</span>
+          </div>
+          
+          
+        </div>
+        
+
+        <a href="https://www-cell-com.libproxy2.usc.edu/cell/fulltext/S0092-8674(26)00274-6?rss=yes" class="read-link" target="_blank" rel="noopener">Read paper &rarr;</a>
+
+      </div>
+    
+    
+      
+      
+
+      
+      
+        
+      
+
+      <div class="paper-card tier-skim">
+
+        <!-- Journal label + triage badge — table for reliable alignment -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin-bottom:7px;">
+          <tr>
+            <td style="vertical-align:middle;">
+              <span class="journal-label">Cell</span>
+            </td>
+            <td style="white-space:nowrap; padding-left:12px; vertical-align:middle; text-align:right;">
+              <span class="triage-badge tier-skim">skim</span>
+              
+            </td>
+          </tr>
+        </table>
+
+        <!-- Title -->
+        <div class="paper-title">
+          <a href="https://www-cell-com.libproxy2.usc.edu/cell/fulltext/S0092-8674(26)00273-4?rss=yes" target="_blank" rel="noopener">Whole-body molecular and cellular mapping of the laboratory mouse</a>
+        </div>
+
+        <!-- Tags -->
+        
+
+        <!-- PI · Institution · Published date -->
+        <div class="meta-line">
+          <span class="meta-author">Chevrier N</span>
+          <span class="meta-sep">&middot;</span>
+          
+            <span style="color:#ccc;">&#127963; Institution unavailable</span>
+          
+          
+            <span class="meta-sep">&middot;</span>Mar 27, 2026
+          
+        </div>
+
+        <!-- Structured summary -->
+        
+        <div class="summary-block">
+          
+          <div class="summary-row">
+            <span class="summary-label">Problem</span>
+            <span class="summary-text">Comprehensive, scalable mapping of all organs and cell types across the whole mouse body has not previously been achieved.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Model</span>
+            <span class="summary-text">Laboratory mouse, whole-body, multi-organ</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Finding</span>
+            <span class="summary-text">A scalable experimental and computational platform was developed enabling comprehensive analysis of tissue organization and disease responses across all mouse organs and cell types.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label" style="color:#d68910;">Focus</span>
+            <span class="summary-text">The platform — a scalable whole-body single-cell atlas with computational infrastructure — is worth noting as a potential reference resource for hematopoietic and immune cell biology in the mouse, and as a methodological model for multi-tissue single-cell integration.</span>
+          </div>
+          
+          
+        </div>
+        
+
+        <a href="https://www-cell-com.libproxy2.usc.edu/cell/fulltext/S0092-8674(26)00273-4?rss=yes" class="read-link" target="_blank" rel="noopener">Read paper &rarr;</a>
+
+      </div>
+    
+    
+      
+      
+
+      
+      
+        
+      
+
+      <div class="paper-card tier-skim">
+
+        <!-- Journal label + triage badge — table for reliable alignment -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin-bottom:7px;">
+          <tr>
+            <td style="vertical-align:middle;">
+              <span class="journal-label">Nature Biotechnology</span>
+            </td>
+            <td style="white-space:nowrap; padding-left:12px; vertical-align:middle; text-align:right;">
+              <span class="triage-badge tier-skim">skim</span>
+              
+            </td>
+          </tr>
+        </table>
+
+        <!-- Title -->
+        <div class="paper-title">
+          <a href="https://www-nature-com.libproxy2.usc.edu/articles/s41587-026-03074-8" target="_blank" rel="noopener">Unpaired data as a first-order challenge in single-cell and spatial proteomics</a>
+        </div>
+
+        <!-- Tags -->
+        
+
+        <!-- PI · Institution · Published date -->
+        <div class="meta-line">
+          <span class="meta-author">Theis F</span>
+          <span class="meta-sep">&middot;</span>
+          
+            <span style="color:#ccc;">&#127963; Institution unavailable</span>
+          
+          
+            <span class="meta-sep">&middot;</span>Mar 27, 2026
+          
+        </div>
+
+        <!-- Structured summary -->
+        
+        <div class="summary-block">
+          
+          <div class="summary-row">
+            <span class="summary-label">Problem</span>
+            <span class="summary-text">Unpaired data — the lack of matched measurements across modalities — poses a fundamental challenge for integrating single-cell and spatial proteomics datasets.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Model</span>
+            <span class="summary-text">N/A — not stated in abstract</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Finding</span>
+            <span class="summary-text">(abstract insufficient — finding not determinable)</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label" style="color:#d68910;">Focus</span>
+            <span class="summary-text">The framing — articulating unpaired data as a first-order rather than secondary challenge in single-cell and spatial proteomics — is worth attention because the same integration problem applies directly to multi-omic analyses (scRNA-seq, ATAC-seq, proteomics) central to the researcher&#39;s computational workflows.</span>
+          </div>
+          
+          
+        </div>
+        
+
+        <a href="https://www-nature-com.libproxy2.usc.edu/articles/s41587-026-03074-8" class="read-link" target="_blank" rel="noopener">Read paper &rarr;</a>
+
+      </div>
+    
+    
+      
+      
+
+      
+      
+        
+      
+
+      <div class="paper-card tier-skim">
+
+        <!-- Journal label + triage badge — table for reliable alignment -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin-bottom:7px;">
+          <tr>
+            <td style="vertical-align:middle;">
+              <span class="journal-label">Nature Immunology</span>
+            </td>
+            <td style="white-space:nowrap; padding-left:12px; vertical-align:middle; text-align:right;">
+              <span class="triage-badge tier-skim">skim</span>
+              
+            </td>
+          </tr>
+        </table>
+
+        <!-- Title -->
+        <div class="paper-title">
+          <a href="https://www-nature-com.libproxy2.usc.edu/articles/s41590-026-02461-2" target="_blank" rel="noopener">ZFP148 is a transcriptional repressor of cytolytic effector CD8 + T cell differentiation</a>
+        </div>
+
+        <!-- Tags -->
+        
+
+        <!-- PI · Institution · Published date -->
+        <div class="meta-line">
+          <span class="meta-author">Li Z</span>
+          <span class="meta-sep">&middot;</span>
+          
+            <span style="color:#ccc;">&#127963; Institution unavailable</span>
+          
+          
+            <span class="meta-sep">&middot;</span>Mar 27, 2026
+          
+        </div>
+
+        <!-- Structured summary -->
+        
+        <div class="summary-block">
+          
+          <div class="summary-row">
+            <span class="summary-label">Problem</span>
+            <span class="summary-text">Whether transcription factors restrain cytolytic effector CD8+ T cell differentiation and, if so, through what molecular mechanism.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Model</span>
+            <span class="summary-text">Antigen-specific CD8+ T cells (implied primary mouse or human immune cells; not further specified in abstract)</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Finding</span>
+            <span class="summary-text">The transcription factor ZFP148 restrains differentiation of antigen-specific CD8+ T cells toward cytolytic effector cells by repressing expression of KLF2.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label" style="color:#d68910;">Focus</span>
+            <span class="summary-text">The specific finding — a named transcriptional repressor of cytolytic effector differentiation — is worth a skim for its potential relevance to engineering CAR-T or CAR-myeloid products with enhanced effector function by modulating ZFP148/KLF2 axis.</span>
+          </div>
+          
+          
+        </div>
+        
+
+        <a href="https://www-nature-com.libproxy2.usc.edu/articles/s41590-026-02461-2" class="read-link" target="_blank" rel="noopener">Read paper &rarr;</a>
+
+      </div>
+    
+    
+      
+      
+
+      
+      
+        
+      
+
+      <div class="paper-card tier-skim">
+
+        <!-- Journal label + triage badge — table for reliable alignment -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin-bottom:7px;">
+          <tr>
+            <td style="vertical-align:middle;">
+              <span class="journal-label">Bone Marrow Transplantation</span>
+            </td>
+            <td style="white-space:nowrap; padding-left:12px; vertical-align:middle; text-align:right;">
+              <span class="triage-badge tier-skim">skim</span>
+              
+            </td>
+          </tr>
+        </table>
+
+        <!-- Title -->
+        <div class="paper-title">
+          <a href="https://www-nature-com.libproxy2.usc.edu/articles/s41409-026-02832-1" target="_blank" rel="noopener">Incidence and outcome of hemorrhagic cystitis after allogeneic hematopoietic cell transplantation: a survey of the infectious diseases working party of EBMT</a>
+        </div>
+
+        <!-- Tags -->
+        
+        <div class="tags">
+          
+            
+              <span class="tag" style="background:#fef0d9; color:#a04000;">Allogeneic</span>
+            
+          
+            
+              <span class="tag" style="background:#fadbd8; color:#922b21;">HSCT</span>
+            
+          
+        </div>
+        
+
+        <!-- PI · Institution · Published date -->
+        <div class="meta-line">
+          <span class="meta-author">Cesaro S</span>
+          <span class="meta-sep">&middot;</span>
+          
+            Pediatric Hematology Oncology, Department of Mother and Child, Azienda Ospedaliera Universitaria Integrata Verona, Verona, Italy. simone.cesaro@aovr.veneto.it.
+          
+          
+            <span class="meta-sep">&middot;</span>Mar 26, 2026
+          
+        </div>
+
+        <!-- Structured summary -->
+        
+        <div class="summary-block">
+          
+          <div class="summary-row">
+            <span class="summary-label">Problem</span>
+            <span class="summary-text">Incidence and clinical outcomes of hemorrhagic cystitis following allogeneic hematopoietic cell transplantation are not well characterized at a large, multi-center level.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Model</span>
+            <span class="summary-text">Allogeneic HCT recipients; EBMT infectious diseases working party survey (multicenter cohort)</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Finding</span>
+            <span class="summary-text">(abstract insufficient — finding not determinable)</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label" style="color:#d68910;">Focus</span>
+            <span class="summary-text">The clinical outcomes data — relevant to allogeneic HSCT safety and complication management — are worth a skim for the researcher&#39;s interest in allogeneic cell therapy and IND-enabling safety studies.</span>
+          </div>
+          
+          
+        </div>
+        
+
+        <a href="https://www-nature-com.libproxy2.usc.edu/articles/s41409-026-02832-1" class="read-link" target="_blank" rel="noopener">Read paper &rarr;</a>
+
+      </div>
+    
+    
+      
+      
+
+      
+      
+        
+      
+
+      <div class="paper-card tier-skim">
+
+        <!-- Journal label + triage badge — table for reliable alignment -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin-bottom:7px;">
+          <tr>
+            <td style="vertical-align:middle;">
+              <span class="journal-label">Science</span>
+            </td>
+            <td style="white-space:nowrap; padding-left:12px; vertical-align:middle; text-align:right;">
+              <span class="triage-badge tier-skim">skim</span>
+              
+            </td>
+          </tr>
+        </table>
+
+        <!-- Title -->
+        <div class="paper-title">
+          <a href="https://www-science-org.libproxy2.usc.edu/doi/abs/10.1126/science.adu7265?af=R" target="_blank" rel="noopener">Family single-cell atlases reveal pig pregnancy and fetal growth restriction critical cell types</a>
+        </div>
+
+        <!-- Tags -->
+        
+
+        <!-- PI · Institution · Published date -->
+        <div class="meta-line">
+          <span class="meta-author">Huang L</span>
+          <span class="meta-sep">&middot;</span>
+          
+            National Key Laboratory for Swine Genetic Improvement and Germplasm Innovation, Ministry of Science and Technology of China, Jiangxi Agricultural University, Nanchang, China.
+          
+          
+            <span class="meta-sep">&middot;</span>Mar 26, 2026
+          
+        </div>
+
+        <!-- Structured summary -->
+        
+        <div class="summary-block">
+          
+          <div class="summary-row">
+            <span class="summary-label">Problem</span>
+            <span class="summary-text">Which cell types are critical during pig pregnancy and fetal growth restriction.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Model</span>
+            <span class="summary-text">Pig (Sus scrofa), single-cell atlas, pregnancy and fetal growth restriction</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Finding</span>
+            <span class="summary-text">(abstract insufficient — finding not determinable)</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label" style="color:#d68910;">Focus</span>
+            <span class="summary-text">The methodology — single-cell atlases of a large mammalian pregnancy model may offer transferable frameworks for building analogous atlases of hematopoietic or immune cell niches during development.</span>
+          </div>
+          
+          
+        </div>
+        
+
+        <a href="https://www-science-org.libproxy2.usc.edu/doi/abs/10.1126/science.adu7265?af=R" class="read-link" target="_blank" rel="noopener">Read paper &rarr;</a>
+
+      </div>
+    
+    
+      
+      
+
+      
+      
+        
+      
+
+      <div class="paper-card tier-skim">
+
+        <!-- Journal label + triage badge — table for reliable alignment -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin-bottom:7px;">
+          <tr>
+            <td style="vertical-align:middle;">
+              <span class="journal-label">Science</span>
+            </td>
+            <td style="white-space:nowrap; padding-left:12px; vertical-align:middle; text-align:right;">
+              <span class="triage-badge tier-skim">skim</span>
+              
+            </td>
+          </tr>
+        </table>
+
+        <!-- Title -->
+        <div class="paper-title">
+          <a href="https://www-science-org.libproxy2.usc.edu/doi/abs/10.1126/science.adz9353?af=R" target="_blank" rel="noopener">A genetically encoded device for transcriptome storage in mammalian cells</a>
+        </div>
+
+        <!-- Tags -->
+        
+
+        <!-- PI · Institution · Published date -->
+        <div class="meta-line">
+          <span class="meta-author">Chen F</span>
+          <span class="meta-sep">&middot;</span>
+          
+            Broad Institute of MIT and Harvard, Cambridge, MA, USA.
+          
+          
+            <span class="meta-sep">&middot;</span>Mar 26, 2026
+          
+        </div>
+
+        <!-- Structured summary -->
+        
+        <div class="summary-block">
+          
+          <div class="summary-row">
+            <span class="summary-label">Problem</span>
+            <span class="summary-text">There is no established method for recording and storing the transcriptome of a living mammalian cell in a genetically encoded, retrievable format.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Model</span>
+            <span class="summary-text">N/A — not stated in abstract</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Finding</span>
+            <span class="summary-text">(abstract insufficient — finding not determinable)</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label" style="color:#d68910;">Focus</span>
+            <span class="summary-text">The methodology — a genetically encoded device for transcriptome storage in mammalian cells — is directly relevant to the researcher&#39;s multi-omics and cell engineering work, as it could enable temporal transcriptional recording in hematopoietic progenitors or engineered cell therapy products.</span>
+          </div>
+          
+          
+        </div>
+        
+
+        <a href="https://www-science-org.libproxy2.usc.edu/doi/abs/10.1126/science.adz9353?af=R" class="read-link" target="_blank" rel="noopener">Read paper &rarr;</a>
+
+      </div>
+    
+    
+      
+      
+
+      
+      
+        
+      
+
+      <div class="paper-card tier-skim">
+
+        <!-- Journal label + triage badge — table for reliable alignment -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin-bottom:7px;">
+          <tr>
+            <td style="vertical-align:middle;">
+              <span class="journal-label">Science</span>
+            </td>
+            <td style="white-space:nowrap; padding-left:12px; vertical-align:middle; text-align:right;">
+              <span class="triage-badge tier-skim">skim</span>
+              
+            </td>
+          </tr>
+        </table>
+
+        <!-- Title -->
+        <div class="paper-title">
+          <a href="https://www-science-org.libproxy2.usc.edu/doi/abs/10.1126/science.aed3712?af=R" target="_blank" rel="noopener">Systems-level organization of extracellular proteostasis</a>
+        </div>
+
+        <!-- Tags -->
+        
+
+        <!-- PI · Institution · Published date -->
+        <div class="meta-line">
+          <span class="meta-author">Vendruscolo M</span>
+          <span class="meta-sep">&middot;</span>
+          
+            Centre for Misfolding Diseases, Yusuf Hamied Department of Chemistry, University of Cambridge, Cambridge, UK.
+          
+          
+            <span class="meta-sep">&middot;</span>Mar 26, 2026
+          
+        </div>
+
+        <!-- Structured summary -->
+        
+        <div class="summary-block">
+          
+          <div class="summary-row">
+            <span class="summary-label">Problem</span>
+            <span class="summary-text">How extracellular proteostasis is organized at a systems level is not well understood.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Model</span>
+            <span class="summary-text">N/A — not stated in abstract</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Finding</span>
+            <span class="summary-text">(abstract insufficient — finding not determinable)</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label" style="color:#d68910;">Focus</span>
+            <span class="summary-text">The systems-level framing of extracellular proteostasis is worth skimming for conceptual frameworks applicable to understanding the extracellular environment in hematopoietic niches and cell therapy contexts.</span>
+          </div>
+          
+          
+        </div>
+        
+
+        <a href="https://www-science-org.libproxy2.usc.edu/doi/abs/10.1126/science.aed3712?af=R" class="read-link" target="_blank" rel="noopener">Read paper &rarr;</a>
+
+      </div>
+    
+    
+      
+      
+
+      
+      
+        
+      
+
+      <div class="paper-card tier-skim">
+
+        <!-- Journal label + triage badge — table for reliable alignment -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin-bottom:7px;">
+          <tr>
+            <td style="vertical-align:middle;">
+              <span class="journal-label">Blood</span>
+            </td>
+            <td style="white-space:nowrap; padding-left:12px; vertical-align:middle; text-align:right;">
+              <span class="triage-badge tier-skim">skim</span>
+              
+            </td>
+          </tr>
+        </table>
+
+        <!-- Title -->
+        <div class="paper-title">
+          <a href="https://pubmed-ncbi-nlm-nih-gov.libproxy2.usc.edu/41885852/?utm_source=Other&amp;utm_medium=rss&amp;utm_campaign=journals&amp;utm_content=blood&amp;fc=None&amp;ff=20260327130008&amp;v=2.19.0.post6+133c1fe" target="_blank" rel="noopener">Benchmarking clonal hematopoiesis in sickle cell disease</a>
+        </div>
+
+        <!-- Tags -->
+        
+
+        <!-- PI · Institution · Published date -->
+        <div class="meta-line">
+          <span class="meta-author">Payne E</span>
+          <span class="meta-sep">&middot;</span>
+          
+            University College London.
+          
+          
+            <span class="meta-sep">&middot;</span>Mar 26, 2026
+          
+        </div>
+
+        <!-- Structured summary -->
+        
+        <div class="summary-block">
+          
+          <div class="summary-row">
+            <span class="summary-label">Problem</span>
+            <span class="summary-text">(not determinable from abstract)</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Model</span>
+            <span class="summary-text">N/A — not stated in abstract</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Finding</span>
+            <span class="summary-text">(abstract insufficient — finding not determinable)</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label" style="color:#d68910;">Focus</span>
+            <span class="summary-text">The topic — clonal hematopoiesis in sickle cell disease — is directly relevant to gene therapy and HSCT contexts the researcher works in; worth skimming for benchmarking methodology or clinical findings that inform allogeneic cell therapy safety considerations.</span>
+          </div>
+          
+          
+        </div>
+        
+
+        <a href="https://pubmed-ncbi-nlm-nih-gov.libproxy2.usc.edu/41885852/?utm_source=Other&amp;utm_medium=rss&amp;utm_campaign=journals&amp;utm_content=blood&amp;fc=None&amp;ff=20260327130008&amp;v=2.19.0.post6+133c1fe" class="read-link" target="_blank" rel="noopener">Read paper &rarr;</a>
+
+      </div>
+    
+    
+      
+      
+
+      
+      
+        
+      
+
+      <div class="paper-card tier-skim">
+
+        <!-- Journal label + triage badge — table for reliable alignment -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin-bottom:7px;">
+          <tr>
+            <td style="vertical-align:middle;">
+              <span class="journal-label">Blood Advances</span>
+            </td>
+            <td style="white-space:nowrap; padding-left:12px; vertical-align:middle; text-align:right;">
+              <span class="triage-badge tier-skim">skim</span>
+              
+            </td>
+          </tr>
+        </table>
+
+        <!-- Title -->
+        <div class="paper-title">
+          <a href="https://pubmed-ncbi-nlm-nih-gov.libproxy2.usc.edu/41886632/?utm_source=Other&amp;utm_medium=rss&amp;utm_campaign=journals&amp;utm_content=bloodadv&amp;fc=None&amp;ff=20260327130008&amp;v=2.19.0.post6+133c1fe" target="_blank" rel="noopener">Non-ICANS Neurologic Toxicity after BCMA CAR T: A systematic review and meta-analysis of 4630 multiple myeloma patients</a>
+        </div>
+
+        <!-- Tags -->
+        
+        <div class="tags">
+          
+            
+              <span class="tag" style="background:#e8daef; color:#6c3483;">CAR-T</span>
+            
+          
+        </div>
+        
+
+        <!-- PI · Institution · Published date -->
+        <div class="meta-line">
+          <span class="meta-author">Yamshon S</span>
+          <span class="meta-sep">&middot;</span>
+          
+            New York University Langone Medical Center, New York, New York, United States.
+          
+          
+            <span class="meta-sep">&middot;</span>Mar 26, 2026
+          
+        </div>
+
+        <!-- Structured summary -->
+        
+        <div class="summary-block">
+          
+          <div class="summary-row">
+            <span class="summary-label">Problem</span>
+            <span class="summary-text">Non-ICANS neurologic toxicities (NINTs) after BCMA-directed CAR-T therapy are poorly defined, with limited data on incidence and risk factors.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Model</span>
+            <span class="summary-text">Systematic review and meta-analysis, 4630 multiple myeloma patients receiving BCMA CAR-T therapy</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Finding</span>
+            <span class="summary-text">A systematic review and meta-analysis characterizes the incidence and risk factors of non-ICANS neurologic toxicities in patients receiving BCMA CAR-T therapies for relapsed/refractory multiple myeloma.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label" style="color:#d68910;">Focus</span>
+            <span class="summary-text">The specific finding on NINT incidence and risk factors is worth a skim for a researcher working on CAR-based cell therapies, as it informs the safety landscape of CAR-T platforms beyond the well-characterized CRS/ICANS spectrum.</span>
+          </div>
+          
+          
+        </div>
+        
+
+        <a href="https://pubmed-ncbi-nlm-nih-gov.libproxy2.usc.edu/41886632/?utm_source=Other&amp;utm_medium=rss&amp;utm_campaign=journals&amp;utm_content=bloodadv&amp;fc=None&amp;ff=20260327130008&amp;v=2.19.0.post6+133c1fe" class="read-link" target="_blank" rel="noopener">Read paper &rarr;</a>
+
+      </div>
+    
+    
+      
+      
+
+      
+      
+        
+        
+      
+
+      <div class="paper-card tier-skim">
+
+        <!-- Journal label + triage badge — table for reliable alignment -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin-bottom:7px;">
+          <tr>
+            <td style="vertical-align:middle;">
+              <span class="journal-label">eLife</span>
+            </td>
+            <td style="white-space:nowrap; padding-left:12px; vertical-align:middle; text-align:right;">
+              <span class="triage-badge tier-skim">skim</span>
+              
+            </td>
+          </tr>
+        </table>
+
+        <!-- Title -->
+        <div class="paper-title">
+          <a href="https://elifesciences-org.libproxy2.usc.edu/articles/104006" target="_blank" rel="noopener">Psilocin fosters neuroplasticity in iPSC-derived human cortical neurons</a>
+        </div>
+
+        <!-- Tags -->
+        
+        <div class="tags">
+          
+            
+              <span class="tag" style="background:#fde8ef; color:#a93226;">iPSC</span>
+            
+          
+        </div>
+        
+
+        <!-- PI · Institution · Published date -->
+        <div class="meta-line">
+          <span class="meta-author">Thorsten Lau</span>
+          <span class="meta-sep">&middot;</span>
+          
+            <span style="color:#ccc;">&#127963; Institution unavailable</span>
+          
+          
+            <span class="meta-sep">&middot;</span>Mar 27, 2026
+          
+        </div>
+
+        <!-- Structured summary -->
+        
+        <div class="summary-block">
+          
+          <div class="summary-row">
+            <span class="summary-label">Problem</span>
+            <span class="summary-text">The molecular and cellular changes induced by psilocybin in human neurons are not well characterized, as prior work has relied on animal models.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Model</span>
+            <span class="summary-text">iPSC-derived human cortical neurons, in vitro</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label">Finding</span>
+            <span class="summary-text">Psilocin induced 5-HT2A-R-mediated BDNF upregulation, transcriptomic signatures associated with neuroplasticity, increased neuronal morphological complexity, elevated synaptic protein expression, and enhanced excitability and synaptic network activity.</span>
+          </div>
+          
+          
+          <div class="summary-row">
+            <span class="summary-label" style="color:#d68910;">Focus</span>
+            <span class="summary-text">The model system — iPSC-derived human cortical neurons used for pharmacological perturbation and transcriptomic profiling — is directly relevant as a platform approach applicable to studying other small-molecule or genetic perturbations in iPSC-derived neural or hematopoietic contexts.</span>
+          </div>
+          
+          
+        </div>
+        
+
+        <a href="https://elifesciences-org.libproxy2.usc.edu/articles/104006" class="read-link" target="_blank" rel="noopener">Read paper &rarr;</a>
+
+      </div>
+    
+    
+    
+
+    
+
+    <div class="footer">
+      PaperBreakfast &mdash; March 27, 2026
+    </div>
+
+  </div>
+</body>
+</html>

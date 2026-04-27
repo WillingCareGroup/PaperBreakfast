@@ -33,6 +33,27 @@ Backends and strategies are fully independent axes. Swap either in `config.yaml`
 
 ---
 
+## Example digest
+
+[![Digest screenshot](docs/examples/digest-screenshot.png)](docs/examples/digest.html)
+
+*March 27, 2026 — 1 Read · 6 Horizon · 11 Skim from 138 papers across 48/48 feeds. [View full HTML](docs/examples/digest.html)*
+
+### Honest uncertainty — no hallucination
+
+When a journal publishes a paper before the full text is available, the abstract often omits the model system used or withholds the key finding. The evaluator is explicitly instructed never to infer or guess these fields. Instead it uses two sentinel phrases that appear verbatim in the digest:
+
+| Field | What you see | What it means |
+|---|---|---|
+| **Model** | `N/A — not stated in abstract` | No experimental model was described in the abstract |
+| **Finding** | `(abstract insufficient — finding not determinable)` | The abstract announced the paper's existence without disclosing the result |
+
+Both are visible in the Read card above (Fuchs lab, *Science*, March 26). The evaluator still classified the paper as **read** and wrote a full Impact field — because relevance can be judged from the problem and the lab, even when the finding is paywalled. Only the fields that would require fabrication are left blank.
+
+This matters because summary fields that silently hallucinate erode trust in the tool over time. A sentinel phrase you can spot immediately is more useful than a plausible-sounding lie.
+
+---
+
 ## Requirements
 
 - Python 3.10+
